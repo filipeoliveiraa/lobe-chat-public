@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import path from 'node:path';
 import { promisify } from 'node:util';
 
+import { getGitWorkingTreeFiles } from '@lobechat/local-file-shell/git';
 import fg from 'fast-glob';
 
 import { projectFileSearchManager } from './projectFileSearchManager';
@@ -84,34 +85,48 @@ const buildEntries = (
       return true;
     });
 
-  const indexedPaths = [...fileEntries, ...ignoredEntries].map((entry) => entry.path);
-
-  return [...collectProjectDirectories(indexedPaths, root), ...fileEntries, ...ignoredEntries];
+  return addMissingParentDirectories([...fileEntries, ...ignoredEntries], root);
 };
 
-const collectGlobFilePaths = async (scope: string): Promise<string[]> => {
-  const files: string[] = [];
+const addMissingParentDirectories = (
+  entries: ProjectFileIndexEntry[],
+  root: string,
+): ProjectFileIndexEntry[] => {
+  const indexedPaths = entries.map((entry) => entry.path);
+  const seen = new Set(indexedPaths);
+  // Explicit entries carry ignore metadata; only synthesize missing parents.
+  const directories = collectProjectDirectories(indexedPaths, root).filter(
+    (entry) => !seen.has(entry.path),
+  );
+
+  return [...directories, ...entries];
+};
+
+const collectGlobEntries = async (scope: string): Promise<ProjectFileIndexEntry[]> => {
+  const entries: ProjectFileIndexEntry[] = [];
   const stream = fg.stream('**/*', {
     cwd: scope,
     dot: true,
     ignore: ['**/node_modules/**', '**/.git/**'],
-    onlyFiles: true,
+    objectMode: true,
+    onlyFiles: false,
   });
 
-  for await (const relativePath of stream as AsyncIterable<string>) {
-    files.push(path.resolve(scope, relativePath));
-    if (files.length >= PROJECT_FILE_GLOB_LIMIT) break;
+  for await (const entry of stream as AsyncIterable<fg.Entry>) {
+    entries.push(
+      createProjectFileEntry(scope, path.resolve(scope, entry.path), entry.dirent.isDirectory()),
+    );
+    if (entries.length >= PROJECT_FILE_GLOB_LIMIT) break;
   }
 
-  return files;
+  return addMissingParentDirectories(entries, scope);
 };
 
 /**
- * Portable project file index for the CLI (and any non-desktop device). Prefers
+ * Shared project file index for desktop and CLI devices. Prefers
  * `git ls-files` (tracked + untracked + collapsed ignored entries,
  * submodule-aware) to enumerate the repo, falling back to a `fast-glob` walk
- * when the scope is not a git repo. Mirrors the desktop
- * `LocalFileCtr.getProjectFileIndex` output shape.
+ * when the scope is not a git repo. Platform adapters own preview authorization.
  */
 export const defaultGetProjectFileIndex = async (
   params: ProjectFileIndexParams = {},
@@ -179,11 +194,8 @@ export const defaultGetProjectFileIndex = async (
     // fall through to glob
   }
 
-  // Non-git scope: walk with fast-glob. `dot: true` keeps dot-directories (e.g.
-  // `.agents`) that the git path would surface via `ls-files`, and `onlyFiles`
-  // leaves directory entries to `buildEntries` so nesting matches the git path.
-  const files = await collectGlobFilePaths(requestedScope);
-  const entries = buildEntries(files, requestedScope);
+  // Include hidden and empty directories consistently across desktop and CLI.
+  const entries = await collectGlobEntries(requestedScope);
 
   return {
     entries,
@@ -191,6 +203,47 @@ export const defaultGetProjectFileIndex = async (
     root: requestedScope,
     source: 'glob',
   };
+};
+
+const filterSearchCandidates = (
+  entries: ProjectFileIndexEntry[],
+  params: ProjectFileSearchParams,
+  includePaths?: string[],
+) => {
+  if (!params.excludeIgnored && !includePaths) return entries;
+
+  const includedPaths = includePaths ? new Set(includePaths) : undefined;
+  return entries.filter(
+    (entry) =>
+      entry.isDirectory ||
+      ((!params.excludeIgnored || !entry.gitIgnored) &&
+        (!includedPaths || includedPaths.has(entry.relativePath))),
+  );
+};
+
+const includeMissingSearchCandidates = (
+  entries: ProjectFileIndexEntry[],
+  includePaths: string[] | undefined,
+  root: string,
+) => {
+  if (!includePaths) return entries;
+
+  const indexedPaths = new Set(entries.map((entry) => entry.relativePath));
+  const rootPrefix = `${path.resolve(root)}${path.sep}`;
+  const missingFiles = includePaths
+    .filter((relativePath) => !indexedPaths.has(relativePath))
+    .map((relativePath) => path.resolve(root, relativePath))
+    .filter((absolutePath) => absolutePath.startsWith(rootPrefix));
+
+  if (missingFiles.length === 0) return entries;
+
+  const additions = buildEntries(missingFiles, root).filter((entry) => {
+    if (indexedPaths.has(entry.relativePath)) return false;
+    indexedPaths.add(entry.relativePath);
+    return true;
+  });
+
+  return [...entries, ...additions];
 };
 
 export const defaultSearchProjectFiles = async (
@@ -210,6 +263,9 @@ export const defaultSearchProjectFiles = async (
       rootResult?.stdout && !exitCode ? rootResult.stdout.trim() || requestedScope : requestedScope;
 
     if (rootResult?.stdout && !exitCode) {
+      const includePaths = params.changedOnly
+        ? Object.values(await getGitWorkingTreeFiles(root)).flat()
+        : undefined;
       const [trackedResult, untrackedResult, ignoredResult] = await Promise.all([
         execFileAsync(
           'git',
@@ -246,7 +302,11 @@ export const defaultSearchProjectFiles = async (
         .split('\n')
         .map((item) => item.trim())
         .filter(Boolean);
-      const entries = buildEntries(files, root, ignoredPaths);
+      const entries = filterSearchCandidates(
+        includeMissingSearchCandidates(buildEntries(files, root, ignoredPaths), includePaths, root),
+        params,
+        includePaths,
+      );
 
       return {
         entries: projectFileSearchManager.selectEntries(entries, params.query, limit),
@@ -260,7 +320,11 @@ export const defaultSearchProjectFiles = async (
   }
 
   const files = await projectFileSearchManager.collectNonGitFilePaths(requestedScope);
-  const entries = buildEntries(files, requestedScope);
+  const entries = filterSearchCandidates(
+    includeMissingSearchCandidates(buildEntries(files, requestedScope), undefined, requestedScope),
+    params,
+    params.changedOnly ? [] : undefined,
+  );
 
   return {
     entries: projectFileSearchManager.selectEntries(entries, params.query, limit),

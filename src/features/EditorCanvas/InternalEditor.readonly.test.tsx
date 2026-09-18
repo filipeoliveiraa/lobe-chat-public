@@ -35,16 +35,9 @@ vi.mock('@lobehub/editor', () => ({
   ReactImagePlugin: vi.fn(),
   ReactLinkPlugin: vi.fn(),
   ReactLiteXmlPlugin: vi.fn(),
+  ReactMentionPlugin: vi.fn(),
   ReactTablePlugin: vi.fn(),
   ReactToolbarPlugin: vi.fn(),
-}));
-
-vi.mock('@lobehub/ui/base-ui', () => ({
-  ActionIcon: ({ onClick, title }: { onClick?: (e: any) => void; title?: string }) => (
-    <button aria-label={title} onClick={onClick}>
-      {title}
-    </button>
-  ),
 }));
 
 vi.mock('@/features/ChatInput/InputEditor/plugins', () => ({

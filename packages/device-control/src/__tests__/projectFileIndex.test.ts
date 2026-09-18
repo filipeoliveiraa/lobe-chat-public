@@ -1,7 +1,8 @@
-import { execFileSync } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { promisify } from 'node:util';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -56,11 +57,37 @@ describe('defaultGetProjectFileIndex', () => {
     expect(result).not.toHaveProperty('totalCount');
   });
 
+  it('keeps ignored directories unique when git also lists their descendants', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'dc-index-ignored-parents-'));
+    cleanup.push(dir);
+    const git = promisify(execFile);
+    await git('git', ['-c', 'init.defaultBranch=main', 'init'], { cwd: dir });
+    await mkdir(path.join(dir, '.husky', '_'), { recursive: true });
+    await writeFile(path.join(dir, '.husky', '_', '.gitignore'), '**\n');
+    await writeFile(path.join(dir, '.husky', '_', 'hook'), 'hook\n');
+
+    const result = await defaultGetProjectFileIndex({ scope: dir });
+    const paths = result.entries.map((entry) => entry.relativePath);
+
+    expect(result.source).toBe('git');
+    expect(new Set(paths).size).toBe(paths.length);
+    for (const relativePath of ['.husky/', '.husky/_/']) {
+      expect(result.entries.filter((entry) => entry.relativePath === relativePath)).toEqual([
+        expect.objectContaining({ gitIgnored: true, isDirectory: true }),
+      ]);
+    }
+    expect(paths).toContain('.husky/_/hook');
+  });
+
   it('falls back to a glob walk when the scope is not a git repo', async () => {
     const dir = await mkdtemp(path.join(tmpdir(), 'dc-index-glob-'));
     cleanup.push(dir);
     await mkdir(path.join(dir, 'nested', 'deep'), { recursive: true });
     await mkdir(path.join(dir, '.agents'), { recursive: true });
+    await mkdir(path.join(dir, 'empty'));
+    await mkdir(path.join(dir, '.hidden-empty'));
+    await mkdir(path.join(dir, 'node_modules', 'dependency'), { recursive: true });
+    await writeFile(path.join(dir, 'node_modules', 'dependency', 'index.js'), 'ignored');
     await writeFile(path.join(dir, 'one.txt'), '1\n');
     await writeFile(path.join(dir, 'nested', 'deep', 'two.txt'), '2\n');
     await writeFile(path.join(dir, '.agents', 'config.md'), '# cfg\n');
@@ -68,7 +95,12 @@ describe('defaultGetProjectFileIndex', () => {
     const result = await defaultGetProjectFileIndex({ scope: dir });
 
     expect(result.source).toBe('glob');
+    const rels = result.entries.map((entry) => entry.relativePath);
     const byRel = Object.fromEntries(result.entries.map((e) => [e.relativePath, e]));
+    expect(new Set(rels).size).toBe(rels.length);
+    expect(byRel['empty/']?.isDirectory).toBe(true);
+    expect(byRel['.hidden-empty/']?.isDirectory).toBe(true);
+    expect(rels.some((relativePath) => relativePath.startsWith('node_modules/'))).toBe(false);
 
     // Nested files are present and attached to synthesized directory entries.
     expect(byRel['nested/deep/two.txt']?.isDirectory).toBe(false);
@@ -143,6 +175,65 @@ describe('defaultSearchProjectFiles', () => {
         relativePath: 'secret.local',
       }),
     ]);
+  });
+
+  it('applies eligible-path and ignore filters before truncating search results', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'dc-search-filtered-'));
+    cleanup.push(dir);
+    execFileSync('git', ['-c', 'init.defaultBranch=main', 'init'], { cwd: dir });
+    await writeFile(path.join(dir, '.gitignore'), '*.local\n');
+    await Promise.all(
+      Array.from({ length: 201 }, (_, index) =>
+        writeFile(path.join(dir, `target-${index.toString().padStart(3, '0')}.ts`), 'target\n'),
+      ),
+    );
+    await writeFile(path.join(dir, 'target-secret.local'), 'ignored\n');
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+    execFileSync('git', ['add', '.'], { cwd: dir });
+    execFileSync('git', ['commit', '-m', 'init'], { cwd: dir });
+    await writeFile(path.join(dir, 'target-200.ts'), 'changed\n');
+
+    const result = await defaultSearchProjectFiles({
+      changedOnly: true,
+      excludeIgnored: true,
+      limit: 1,
+      query: 'target',
+      scope: dir,
+    });
+
+    expect(result.entries.map((entry) => entry.relativePath)).toEqual(['target-200.ts']);
+  });
+
+  it('fuzzy-ranks missing eligible paths with indexed files before applying the limit', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'dc-search-deleted-'));
+    cleanup.push(dir);
+    execFileSync('git', ['-c', 'init.defaultBranch=main', 'init'], { cwd: dir });
+    await writeFile(path.join(dir, 'button-helper.ts'), 'button\n');
+    await writeFile(path.join(dir, 'Button.tsx'), 'button\n');
+    await writeFile(path.join(dir, 'ButtonStory.tsx'), 'button\n');
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
+    execFileSync('git', ['add', '.'], { cwd: dir });
+    execFileSync('git', ['commit', '-m', 'init'], { cwd: dir });
+    await Promise.all([
+      rm(path.join(dir, 'Button.tsx')),
+      rm(path.join(dir, 'ButtonStory.tsx')),
+      writeFile(path.join(dir, 'button-helper.ts'), 'changed\n'),
+    ]);
+
+    const result = await defaultSearchProjectFiles({
+      changedOnly: true,
+      limit: 2,
+      query: 'btn',
+      scope: dir,
+    });
+
+    const relativePaths = result.entries
+      .filter((entry) => !entry.isDirectory)
+      .map((entry) => entry.relativePath);
+    expect(relativePaths).toHaveLength(2);
+    expect(relativePaths).toContain('Button.tsx');
   });
 
   it('searches hidden project directories in non-git scopes', async () => {

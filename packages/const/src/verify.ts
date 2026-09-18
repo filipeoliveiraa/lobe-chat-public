@@ -72,6 +72,28 @@ export const verifyRunStatuses = [
 export type VerifyRunStatus = (typeof verifyRunStatuses)[number];
 
 /**
+ * A draft round only describes what will be verified: nothing has executed and
+ * nobody has decided. Drafts follow the live plan and are reused by the next
+ * plan or ingest instead of consuming another round number.
+ *
+ * A replay is excluded: it is pinned to the source round's frozen definition, so
+ * it must not follow later graph edits or absorb another flow. Only the newest
+ * round can be the open draft — an older one left behind by a replay is an
+ * abandoned ledger position, so callers check the latest round rather than
+ * searching the whole chain.
+ */
+export const isDraftVerifyRun = (run: {
+  metadata?: { replayOfRunId?: string } | null;
+  planConfirmedAt?: Date | string | null;
+  status?: string | null;
+  userDecision?: string | null;
+}): boolean =>
+  run.status === 'planned' &&
+  !run.planConfirmedAt &&
+  !run.userDecision &&
+  !run.metadata?.replayOfRunId;
+
+/**
  * What produced a verification session.
  * - agent:         verifying a real Agent Run (`verify_runs.operation_id` set)
  * - agent-testing: a standalone session ingested from the agent-testing harness
@@ -162,6 +184,14 @@ const PROGRAMMATIC_TEST_PATTERNS: RegExp[] = [
   // Chinese
   /单元测试|单测|集成测试|回归测试|类型检查|类型校验|测试覆盖率|代码覆盖率|静态检查|测试用例全部通过/,
 ];
+
+/**
+ * Stored title of the synthesized holistic fallback check (one broad agent
+ * verify over the whole deliverable, used when a task opted into verify without
+ * decomposing into criteria). The server persists this fixed English string;
+ * clients match against it to render a localized display title instead.
+ */
+export const HOLISTIC_CHECK_TITLE = 'Task delivery acceptance';
 
 /**
  * Whether a proposed acceptance check is really one of the repo's programmatic
@@ -365,3 +395,37 @@ export interface VerifyRunOrigin {
   /** The topic to reopen to continue from this report. */
   topicId?: string;
 }
+
+/**
+ * GOMS-KLM interaction cost — the standard model for pricing a verification
+ * round's *user-equivalent* interaction cost.
+ *
+ * The seam is deliberate: a UI driver (the acceptance skill's agent-browser
+ * wrapper) only emits raw **operator counts** per action into a JSONL trace; the
+ * platform turns counts into seconds with the timing model below. Keeping the
+ * timing here rather than in the driver means every report is priced by one
+ * model, and any published `interactionCost` can be recomputed from its trace.
+ */
+export const GOMS_KLM_MODEL = 'goms-klm@lobe-v1';
+
+/** Schema tag every trace atom carries; a foreign tag is not summed. */
+export const GOMS_KLM_TRACE_SCHEMA = 'lobehub.agentBrowserKlmTrace@1';
+
+/**
+ * Conventional trace filename inside a report directory. `acceptance run ingest`
+ * picks it up automatically — absent means the round simply has no interaction
+ * cost (a CLI-only run, or a machine without agent-browser), never an error.
+ */
+export const GOMS_KLM_TRACE_FILE = 'interaction-trace.jsonl';
+
+/**
+ * Seconds per KLM operator (Card, Moran & Newell), tuned for pointer-driven web
+ * UI. `T_char` prices one typed character; `R_ms` is measured wait, not modeled.
+ */
+export const GOMS_KLM_TIMING_SECONDS = {
+  H: 0.4,
+  K: 0.2,
+  M: 1.35,
+  P: 1.1,
+  T_char: 0.2,
+} as const;
