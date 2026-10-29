@@ -31,6 +31,11 @@ export interface GoalState {
    * (what the project dashboard and the route meta read) and one sibling entry
    * per narrow tab (`goalListKey`).
    */
+  /**
+   * The agent the cross-agent goals page is narrowed to; unset lists every
+   * agent's goals. Kept in the store so returning from a goal keeps the filter.
+   */
+  goalListAgentFilter?: string;
   goalListByAgentId: Record<string, GoalListValue>;
   goalListFilter: GoalListFilter;
   /** Local-first bookkeeping for `goalListByAgentId`. */
@@ -54,6 +59,10 @@ export interface GoalState {
   homeGoalsByScope: Record<string, GoalListValue>;
   /** Local-first bookkeeping for `homeGoalsByScope`. */
   homeGoalsReplica: ReplicaState<GoalListValue>;
+  /** Goals created from one conversation, keyed by topic id. */
+  topicGoalsByTopicId: Record<string, GoalListValue>;
+  /** Local-first bookkeeping for `topicGoalsByTopicId`. */
+  topicGoalsReplica: ReplicaState<GoalListValue>;
 }
 
 export const initialState: GoalState = {
@@ -68,4 +77,6 @@ export const initialState: GoalState = {
   goalViewMode: 'list',
   homeGoalsByScope: {},
   homeGoalsReplica: createReplicaState(),
+  topicGoalsByTopicId: {},
+  topicGoalsReplica: createReplicaState(),
 };

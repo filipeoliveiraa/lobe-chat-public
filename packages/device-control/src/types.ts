@@ -61,6 +61,8 @@ export interface ListProjectSkillsResult {
 }
 
 export interface StatPathResult {
+  /** Device-resolved path; aliases and symlinks share one execution-directory lock. */
+  canonicalPath?: string;
   exists: boolean;
   isDirectory: boolean;
   repositoryUrl?: string;
@@ -157,7 +159,16 @@ export type LocalFilePreview =
   | LocalFilePreviewText
   | LocalFilePreviewUnsupported;
 
+/** Terminal reasons a file preview failed (see `LocalFilePreviewResult.code`). */
+export type LocalFilePreviewFailureCode = 'forbidden' | 'not_found';
+
 export interface LocalFilePreviewResult {
+  /**
+   * Set when the failure is terminal for this file: `not_found` (deleted /
+   * moved) or `forbidden` (outside the approved roots, permission denied).
+   * Absent for transient failures, so a cached preview survives those.
+   */
+  code?: LocalFilePreviewFailureCode;
   error?: string;
   preview?: LocalFilePreview;
   success: boolean;

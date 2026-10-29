@@ -16,6 +16,7 @@ import type { LobeChatDatabase } from '@/database/type';
 import { authedProcedure, router } from '@/libs/trpc/lambda';
 import { serverDatabase } from '@/libs/trpc/lambda/middleware';
 import { KeyVaultsGateKeeper } from '@/server/modules/KeyVaultsEncrypt';
+import { flattenBotWakeSettings } from '@/server/services/agentSignal/scenarios/botWake/config';
 import {
   assertBotAccessSettings,
   assertWatchKeywordsWritable,
@@ -36,6 +37,10 @@ import {
   platformRegistry,
   withResolvedConcurrencySettings,
 } from '@/server/services/bot/platforms';
+import {
+  beginFeishuAppRegistration,
+  pollFeishuAppRegistration,
+} from '@/server/services/bot/platforms/feishu/registration';
 import { GatewayService } from '@/server/services/gateway';
 import { getBotRuntimeStatus } from '@/server/services/gateway/runtimeStatus';
 
@@ -168,6 +173,18 @@ function assertFieldFormatsForTRPC(
     message: `Invalid format for ${formatFieldFormatViolations(violations)}`,
   });
 }
+
+/**
+ * The settings a channel form renders.
+ *
+ * Two projections compose here: the concurrency strategy the runtime will actually use, and a
+ * hand-written nested `botWake` object expanded into the flat keys the form writes. Both exist so
+ * the form paints what is really configured — a raw row would show a strategy the platform no
+ * longer offers, or a bot-wake switch stuck at its default while the runtime follows the nested
+ * object the form cannot see.
+ */
+const withFormSettings = (platform: string, settings?: Record<string, unknown>) =>
+  flattenBotWakeSettings(withResolvedConcurrencySettings(platform, settings));
 
 export const agentBotProviderRouter = router({
   listPlatforms: authedProcedure.query(async ({ ctx }) => {
@@ -309,10 +326,7 @@ export const agentBotProviderRouter = router({
         // before `burst` existed still stores `queue`, which its platform no
         // longer offers; rendering that raw would also let an untouched save
         // persist its stale window as a real collection window.
-        settings: withResolvedConcurrencySettings(
-          p.platform,
-          p.settings as Record<string, unknown> | undefined,
-        ),
+        settings: withFormSettings(p.platform, p.settings as Record<string, unknown> | undefined),
       }));
     }),
 
@@ -392,10 +406,7 @@ export const agentBotProviderRouter = router({
         // before `burst` existed still stores `queue`, which its platform no
         // longer offers; rendering that raw would also let an untouched save
         // persist its stale window as a real collection window.
-        settings: withResolvedConcurrencySettings(
-          p.platform,
-          p.settings as Record<string, unknown> | undefined,
-        ),
+        settings: withFormSettings(p.platform, p.settings as Record<string, unknown> | undefined),
       }));
     }),
 
@@ -573,6 +584,46 @@ export const agentBotProviderRouter = router({
         workspaceId: ctx.workspaceId ?? undefined,
       });
       return pollQrStatus(input.qrcode);
+    }),
+
+  /** Feishu / Lark scan-to-create: returns the QR link that creates the bot app. */
+  feishuRegisterBegin: authedProcedure
+    .input(
+      z.object({
+        avatar: z.string().url().optional(),
+        desc: z.string().max(200).optional(),
+        name: z.string().max(64).optional(),
+        platform: z.enum(['feishu', 'lark']),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      await assertBotFeatureAccess({
+        action: 'manage',
+        platform: input.platform,
+        userId: ctx.userId,
+        workspaceId: ctx.workspaceId ?? undefined,
+      });
+      const { platform: _platform, ...preset } = input;
+      return beginFeishuAppRegistration(preset);
+    }),
+
+  /** Polls the scan; on success returns the new app's credentials and tenant brand. */
+  feishuRegisterPoll: authedProcedure
+    .input(
+      z.object({
+        brand: z.enum(['feishu', 'lark']),
+        deviceCode: z.string(),
+        platform: z.enum(['feishu', 'lark']),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      await assertBotFeatureAccess({
+        action: 'manage',
+        platform: input.platform,
+        userId: ctx.userId,
+        workspaceId: ctx.workspaceId ?? undefined,
+      });
+      return pollFeishuAppRegistration(input.deviceCode, input.brand);
     }),
 
   update: agentBotProviderProcedureWrite

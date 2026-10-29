@@ -1,4 +1,9 @@
 export default {
+  'sharePage.app.open': 'Open app',
+  'sharePage.app.help': 'Trouble opening the app?',
+  'sharePage.app.helpDescription':
+    'If this browser prevents opening the app, use its menu to open this page in your system browser. You can also keep reading here.',
+
   'backgroundActivity.alertDesc': '{{name}} is using {{memory}} of memory and {{cpu}} CPU.',
   'backgroundActivity.cpu': 'CPU',
   'backgroundActivity.details': 'View details',
@@ -17,6 +22,20 @@ export default {
   'backgroundActivity.topic': 'Conversation',
   'backgroundActivity.unavailable':
     'Resource data is unavailable. Displayed values may be out of date.',
+  'heteroAgent.claudeQuota.accountNotSignedIn':
+    "The Claude Code account {{account}} isn't signed in on this device. Sign in to it from Manage accounts, or switch to another account.",
+  'heteroAgent.claudeQuota.accountResolveFailed':
+    "Couldn't look up this Claude Code account's login on this device. Try again, or switch to another account.",
+  'heteroAgent.claudeQuota.manage.add': 'Add account',
+  'heteroAgent.claudeQuota.manage.addHintDesktop':
+    'Each account signs in on this device; runs use the account you pick.',
+  'heteroAgent.claudeQuota.manage.loginFailed': "Sign-in didn't finish. Try again.",
+  'heteroAgent.claudeQuota.manage.loginSuccess': 'Signed in as {{account}}',
+  'heteroAgent.claudeQuota.manage.loginWaiting': 'Finish signing in in your browser…',
+  'heteroAgent.claudeQuota.manage.notSignedIn': 'Not signed in on this device',
+  'heteroAgent.claudeQuota.manage.signIn': 'Sign in',
+  'heteroAgent.claudeQuota.noRunnableAccount':
+    "None of the Claude Code accounts in this agent's rotation are signed in on this device. Sign one in from Manage accounts, or add a signed-in account to the rotation.",
   'processExplorer.copyPid': 'Copy PID',
   'processExplorer.filter': 'Filter',
   'processExplorer.live': 'Live · updates every 2 s',
@@ -43,13 +62,13 @@ export default {
   'goalBatch.enter': 'Open',
   'goalBatch.planPanel.compare': 'Compare versions',
   'goalBatch.planPanel.compareTitle': 'Compare plan versions',
-  'goalBatch.planPanel.files': 'Files',
-  'goalBatch.planPanel.foldFiles': 'Hide files',
   'goalBatch.planPanel.forked':
     'A forked plan: it starts again from the batch’s original outline instead of revising the previous version',
   'goalBatch.planPanel.latest': 'v{{revision}} · latest',
   'goalBatch.planPanel.same': 'Same as v{{base}}',
-  'goalBatch.planPanel.unfoldFiles': 'Show files',
+  'goalBatch.probes.attemptNext': 'Next run',
+  'goalBatch.probes.attemptOf': 'Run {{current}} / {{total}}',
+  'goalBatch.probes.attemptPrevious': 'Previous run',
   'goalBatch.probes.cell.backlog': 'Not started',
   'goalBatch.probes.cell.done': 'Done',
   'goalBatch.probes.cell.human': 'Needs you',
@@ -60,6 +79,32 @@ export default {
   'goalBatch.gateCheck.no_open_decision': 'No decision in the batch is waiting on a person',
   'goalBatch.gateCheck.plan_written': 'The batch plan is written',
   'goalBatch.gateCheck.uncovered': 'Not covered: {{values}}',
+  'goalBatch.gateCheck.interventions_accounted': 'Every person’s intervention was accounted for',
+  'goalBatch.gateCheck.reverified': 'The delivered units passed the retro’s criteria',
+  'goalBatch.retro.added': '{{count}} new',
+  'goalBatch.retro.changes': '{{count}} steps changed',
+  'goalBatch.retro.criteria': '{{block}} blocking · {{warn}} advisory',
+  'goalBatch.retro.hint':
+    'What the execution ran into, kept in two layers: experience goes into the plan skill every unit loads, criteria go into the verifier every unit is judged on. The gate opens only after the retro.',
+  'goalBatch.retro.interventionsShort': '{{accounted}}/{{total}} accounted',
+  'goalBatch.retro.loosened': '{{count}} loosened, needs you',
+  'goalBatch.retro.mark.blocked': 'Unaccounted',
+  'goalBatch.retro.mark.done': 'Exp v{{skill}} · Crit v{{verifier}}',
+  'goalBatch.retro.mark.pending': 'Retro owed',
+  'goalBatch.retro.mark.pendingHint': 'This wave finished; its retro has not run yet',
+  'goalBatch.retro.mark.running': 'In retro',
+  'goalBatch.retro.skill': 'Experience · plan skill v{{version}}',
+  'goalBatch.retro.status.blocked': 'Interventions not accounted for',
+  'goalBatch.retro.status.done': 'Retro done',
+  'goalBatch.retro.status.running': 'In retro',
+  'goalBatch.retro.summary.interventions': '{{accounted}}/{{total}} interventions accounted for',
+  'goalBatch.retro.summary.reverify': 'Re-verified {{passed}}/{{total}}',
+  'goalBatch.retro.summary.skill': 'Plan skill v{{version}}: {{count}} steps changed',
+  'goalBatch.retro.summary.verifier':
+    'Verifier v{{version}}: {{added}} added, {{loosened}} loosened',
+  'goalBatch.retro.title': 'Retro · cold start',
+  'goalBatch.retro.titleWave': 'Retro · wave {{wave}} sent back',
+  'goalBatch.retro.verifier': 'Criteria · verifier v{{version}}',
   'goalBatch.gateCheck.units_settled': 'Every unit this round finished',
   'goalBatch.gateCheck.units_succeeded':
     'Every unit this round ran through on its own — none failed or was sent back',
@@ -91,10 +136,14 @@ export default {
   'goalBatch.gatePanel.next.passed':
     'Released wave {{wave}} ({{count}} units) — judged again once it finishes',
   'goalBatch.gatePanel.next.passedDone': 'The whole roster is released',
+  'goalBatch.gatePanel.next.distilling':
+    'The main Agent is updating the plan from what the probes ran into — judged once it is done',
   'goalBatch.gatePanel.next.revising': 'The main Agent is rewriting the plan from your correction',
   'goalBatch.gatePanel.next.rejected': 'Reopened as v{{revision}} on your decision',
   'goalBatch.gatePanel.verdict': 'Verdict',
   'goalBatch.gate.checkCount': '{{count}} checks',
+  'goalBatch.gate.hintSection.execution': 'Execution',
+  'goalBatch.gate.hintSection.retro': 'Retro & criteria',
   'goalBatch.gate.hintTitle': 'Checked before the rest are released:',
   'goalBatch.gate.status.checking': 'Judging',
   'goalBatch.gate.status.human': 'Needs your decision',
@@ -232,6 +281,9 @@ export default {
   'permission.configAccess.groupRoleRestricted':
     'Your workspace role cannot configure Agent Groups. You were returned to chat.',
   'agentNotFound.title': 'Agent Unavailable',
+  'agentSkillModal.loadFailed': "Couldn't load this skill",
+  'agentSkillModal.notFound': 'This skill no longer exists. It may have been deleted.',
+  'agentSkillModal.openDocument': 'Open in documents',
   'groupNotFound.desc':
     'This group does not exist or is no longer accessible — it may have been deleted or set to private by its owner.',
   'groupNotFound.title': 'Group Unavailable',
@@ -279,6 +331,7 @@ export default {
   'builtinCopilot': 'Built-in Copilot',
   'chatList.earlierHistoryError': "Couldn't load earlier messages",
   'chatList.expandMessage': 'Expand Message',
+  'chatList.laterHistoryError': "Couldn't load later messages",
   'chatList.longMessageDetail': 'View Details',
   'chatList.refreshError': "Couldn't refresh messages",
   'chatList.refreshing': 'Fetching latest messages…',
@@ -287,6 +340,11 @@ export default {
   'compression.cancel': 'Uncompress',
   'compression.cancelConfirm':
     'Are you sure you want to uncompress? This will restore the original messages.',
+  'compression.collapsed': 'Compressed {{turns}} earlier turns · View summary',
+  'compression.collapsedUnknown': 'Compressed earlier history · View summary',
+  'compression.emptySummary': 'The model returned an empty summary',
+  'compression.failed': 'Context compression failed, original messages kept',
+  'compression.failedReason': 'Summary generation failed: {{reason}}',
   'compression.history': 'Original conversation',
   'compression.summary': 'History summary',
   'confirmClearCurrentMessages':
@@ -297,16 +355,21 @@ export default {
     'You are about to delete this category. After deletion, its agents will be moved to the default list. Please confirm your action.',
   'confirmRemoveGroupSuccess': 'Group deleted successfully',
   'confirmRemoveSessionItemAlert':
-    'You are about to delete this agent and its conversations. They will be moved to the trash and can be restored within 30 days.',
+    'You are about to delete this agent and its topics. They will be moved to the trash and can be restored within 30 days.',
   'confirmRemoveSessionSuccess': 'Agent removed successfully',
   'defaultAgent': 'Default Agent',
   'defaultGroupChat': 'Group',
   'defaultList': 'Default List',
   'defaultSession': 'Default Agent',
+  'desktopNotification.agentFailed.body': 'Open the conversation for details',
+  'desktopNotification.agentFailed.title': '{{name}} ran into a problem',
   'desktopNotification.aiReplyCompleted.body': 'Agent reply is ready',
   'desktopNotification.aiReplyCompleted.title': 'Reply completed',
   'desktopNotification.humanApprovalRequired.body': 'An Agent needs your approval to continue',
   'desktopNotification.humanApprovalRequired.title': 'Approval required',
+  'desktopNotification.workingDirectoryUnavailable.body': 'Working directory unavailable: {{path}}',
+  'desktopNotification.workingDirectoryUnavailable.bodyWithoutPath':
+    'Working directory unavailable: the folder saved for this conversation no longer exists',
   'cliDetectionTimeoutGuide.actions.openSystemTools': 'Open System Tools',
   'cliDetectionTimeoutGuide.actions.retry': 'Detect again',
   'cliDetectionTimeoutGuide.desc':
@@ -467,6 +530,7 @@ export default {
   'editedFiles.title_one': 'Edited {{count}} file',
   'editedFiles.title_other': 'Edited {{count}} files',
   'editedFiles.hideChanges': 'Hide changes',
+  'editedFiles.previewUnavailable': 'Preview unavailable',
   'editedFiles.showLess': 'Show fewer files',
   'editedFiles.showMore_one': 'Show {{count}} more file',
   'editedFiles.showMore_other': 'Show {{count}} more files',
@@ -819,6 +883,7 @@ export default {
   'heteroAgent.executionTarget.gateway': 'Gateway',
   'heteroAgent.executionTarget.gatewayDesc':
     'Run through the device gateway so other clients can follow progress',
+  'heteroAgent.executionTarget.loadFailed': 'Couldn’t load devices.',
   'heteroAgent.executionTarget.loading': 'Loading devices…',
   'heteroAgent.executionTarget.local': 'Local device',
   'heteroAgent.executionTarget.localDesc': 'Run as a local process on this desktop app',
@@ -842,6 +907,7 @@ export default {
   'heteroAgent.executionTarget.online': 'Online',
   'heteroAgent.executionTarget.onlineConnections_one': 'Online · {{count}} connection',
   'heteroAgent.executionTarget.onlineConnections_other': 'Online · {{count}} connections',
+  'heteroAgent.executionTarget.presenceChecking': 'Checking status…',
   'heteroAgent.executionTarget.projectDevicesHint':
     "Only devices with this project's working directory are listed. Add a directory for another device in the project settings.",
   'heteroAgent.executionTarget.switchProjectTopic.content':
@@ -877,6 +943,10 @@ export default {
   'input.addUser': 'Add a user message',
   'input.agentModeUnsupportedModel':
     'The current model doesn’t support agentic tool calling. Switch to a model with agent capability for the best experience.',
+  'input.agentSlugMoved':
+    'This link now opens a different agent. Switching to it — try again once it opens. Your draft is kept.',
+  'input.agentSlugUnconfirmed':
+    'Couldn’t confirm which agent this link opens. Check your connection, then try again.',
   'input.costEstimate.creditsPerMillionTokens': '{{credits}} credits/M tokens',
   'input.costEstimate.hint': 'Estimated cost: ~{{credits}} credits',
   'input.costEstimate.inputLabel': 'Input',
@@ -903,7 +973,7 @@ export default {
     'The current model is no longer available. Choose another model to continue.',
   'input.viewOnlyAgent': 'You can only view this agent',
   'input.viewOnlyGroup': 'You can only view this group',
-  'input.heteroPlus.tooltip': 'Formatting and scheduling',
+  'input.heteroPlus.tooltip': 'Attachments, formatting and scheduling',
   'input.more': 'More',
   'input.notice.summary_one': '{{count}} input notice',
   'input.notice.summary_other': '{{count}} input notices',
@@ -926,7 +996,11 @@ export default {
   'inputQueue.enqueueRejected': 'Queue is full. Try again after the current run finishes.',
   'inputQueue.queuedHint': 'Sends when the current step finishes',
   'inputQueue.queuedMergeHint': 'Merged and sent when the current step finishes',
+  'inputQueue.queuedRunEndHint': 'Sends when the current run finishes',
+  'inputQueue.queuedRunEndMergeHint': 'Merged and sent when the current run finishes',
   'inputQueue.sendNow': 'Send now (interrupts current run)',
+  'inputQueue.alreadyDelivered': 'Already sent to the agent',
+  'inputQueue.withdrawFailed': 'Couldn’t take the message back. Try again.',
   'intentUnderstanding.title': 'Understanding your intent...',
   'inviteMembers': 'Invite members',
   'knowledgeBase.all': 'All Content',
@@ -1032,13 +1106,27 @@ export default {
   'messageForward.successMulti': 'Forwarded to {{count}} agents',
   'messageForward.transcript.header':
     'The following {{count}} messages were forwarded from another conversation. Please use them as context and continue:',
-  'messageForward.topic.handoffFailed':
-    'Transfer did not start because the source continuation could not be cancelled. It may already be running. Refresh the conversation and check its status.',
-  'messageForward.topic.sourceSchedulePaused':
-    'Transfer could not be confirmed. The original scheduled continuation is paused. Check the target conversation before retrying or scheduling again.',
   'messageForward.topic.context': 'Topic context',
   'messageForward.topic.description':
     "The selected Agent will receive this topic's context and continue the work.",
+  'messageForward.topic.handoff.failed': 'Could not hand off this topic. Please try again.',
+  'messageForward.topic.handoff.header':
+    'The following topic was handed off from another conversation. Please use it as context and continue:',
+  'messageForward.topic.handoff.notStarted':
+    'Handoff did not start because the source continuation could not be cancelled. It may already be running. Refresh the conversation and check its status.',
+  'messageForward.topic.handoff.notePlaceholder':
+    'Add a note (optional) — sent along with the topic context',
+  'messageForward.topic.handoff.partialFailed': 'Could not hand off to some Agents',
+  'messageForward.topic.handoff.sourceSchedulePaused':
+    'Handoff could not be confirmed. The original scheduled continuation is paused. Check the target conversation before retrying or scheduling again.',
+  'messageForward.topic.handoff.submit': 'Hand off',
+  'messageForward.topic.handoff.submitCount': 'Hand off ({{count}})',
+  'messageForward.topic.handoff.success': 'Handed off to {{title}}',
+  'messageForward.topic.handoff.successMulti_one': 'Handed off to {{count}} Agent',
+  'messageForward.topic.handoff.successMulti_other': 'Handed off to {{count}} Agents',
+  'messageForward.topic.handoff.title': 'Hand off to another Agent',
+  'messageForward.topic.handoff.unconfirmed':
+    'Handoff could not be confirmed. Check the target conversation before trying again.',
   'messageForward.topic.header':
     'The following topic was forwarded from another conversation. Please use it as context and continue:',
   'messageForward.topic.loadFailed': 'Could not load this topic for forwarding',
@@ -1170,9 +1258,9 @@ export default {
   'cliOverloadedGuide.retryHint':
     'Wait a few seconds and retry. If it keeps failing, the provider may be having a wider incident.',
   'cliOverloadedGuide.title': '{{name}} is temporarily overloaded',
+  'cliRateLimitGuide.actions.handoff': 'Hand off to another Agent',
   'cliRateLimitGuide.actions.openSystemTools': 'Open System Tools',
   'cliRateLimitGuide.actions.retry': 'Retry message',
-  'cliRateLimitGuide.actions.transfer': 'Transfer to another Agent',
   'cliRateLimitGuide.afterReset':
     'This account has reached its current usage limit. You can continue after {{resetAt}}.',
   'cliRateLimitGuide.afterResetWithLimitType':
@@ -1197,7 +1285,6 @@ export default {
   'cliRateLimitGuide.schedule.continueAfter': 'Continue in ~{{duration}}',
   'cliRateLimitGuide.schedule.continueAfterReset': 'Continue after reset',
   'cliRateLimitGuide.schedule.retryNow': 'Retry now',
-  'cliRateLimitGuide.schedule.runNow': 'Run now',
   'cliRateLimitGuide.schedule.scheduledAfterReset':
     'Scheduled. This run will continue automatically once the limit resets.',
   'cliRateLimitGuide.schedule.scheduledForApprox':
@@ -1261,12 +1348,17 @@ export default {
   'grokBuildInstallGuide.menuNotification.title': 'Grok Build CLI not found',
   'grokBuildInstallGuide.reason': 'LobeHub could not start Grok Build: {{message}}',
   'grokBuildInstallGuide.title': 'Install Grok Build CLI',
+  'workingDirectoryGuide.actions.resetToSource': 'Switch back to {{name}} and retry',
   'workingDirectoryGuide.actions.retry': 'Retry',
   'workingDirectoryGuide.desc':
     'The working directory saved for this conversation no longer exists.',
   'workingDirectoryGuide.hint':
     'Choose an existing folder from the working directory selector, then retry this message.',
+  'workingDirectoryGuide.resetFailed':
+    'Could not switch back to the main directory. Please try again.',
   'workingDirectoryGuide.title': 'Working directory unavailable',
+  'workingDirectoryGuide.worktreeHint':
+    'This conversation was still in a worktree that has since been removed. Switch back to the main directory to keep working.',
   'opencodeInstallGuide.actions.openDocs': 'Open Install Guide',
   'opencodeInstallGuide.actions.openSystemTools': 'Open System Tools',
   'opencodeInstallGuide.afterInstall':
@@ -1342,6 +1434,8 @@ export default {
   'newPlatformAgent': 'Connect External Agents',
   'newPlatformAgentDesc': 'Connect Claude Code, OpenClaw, and other agents',
   'newGroupChat': 'Create Group',
+  'agent.copyId': 'Copy Agent ID',
+  'agent.copyIdSuccess': 'Agent ID copied',
   'agent.publishToWorkspace': 'Publish to Workspace',
   'agent.publishToWorkspaceErrorFixedPrivateDevice':
     'Publish the fixed device to the workspace, or let members choose a device, before publishing this Agent.',
@@ -1368,6 +1462,7 @@ export default {
   'opStatusTray.status.toolCalling': 'Calling tools',
   'opStatusTray.cost': 'cost',
   'opStatusTray.steps': 'steps',
+  'opStatusTray.llmCalls': 'LLM calls',
   'opStatusTray.tokens': 'tokens',
 
   // Connect Agent wizard (device-first): pick a machine, auto-scan the agents
@@ -1450,6 +1545,13 @@ export default {
   'platformAgent.deviceGuard.refresh': 'Refresh',
   'platformAgent.deviceGuard.configure': 'Configure',
   'newPage': 'Create Page',
+  'noReply.reason.already_handled': 'Someone else is on it',
+  'noReply.reason.duplicate': 'Already answered',
+  'noReply.reason.not_addressed': 'Not addressed to me',
+  'noReply.reason.nothing_to_add': 'Nothing to add',
+  'noReply.reason.off_topic': 'Not relevant to me',
+  'noReply.reason.stand_down': 'Stepping back from this conversation',
+  'noReply.title': 'Read the message and chose not to reply',
   'noAgentsYet': 'This group has no members yet. Click the + button to invite agents.',
   'noAvailableAgents': 'No members available to invite',
   'noMatchingAgents': 'No matching members found',
@@ -1649,6 +1751,11 @@ export default {
   'sessionGroup.manageCategory': 'Manage Category',
   'sessionGroup.confirmRemoveGroupAlert':
     'This category is about to be deleted. After deletion, the agents in this category will be moved to the default list. Please confirm your operation.',
+  'sessionGroup.createAgentFailed': "Couldn't create the agent. Please try again.",
+  'sessionGroup.createAgentPinFailed':
+    'Agent created, but pinning failed. You can pin it from the list.',
+  'sessionGroup.createAgentRefreshFailed':
+    "Agent created, but the list couldn't refresh. Refresh the list to see it.",
   'sessionGroup.createAgentSuccess': 'Agent created successfully',
   'sessionGroup.createGroup': 'Add New Category',
   'sessionGroup.createGroupFailed': 'Failed to create category',
@@ -1732,7 +1839,7 @@ export default {
   'shareModal.popover.loadError': 'Failed to load sharing settings, please try again later',
   'shareModal.popover.privacyWarning.confirm': 'Share & copy link',
   'shareModal.popover.privacyWarning.content':
-    "Anyone with the link can open this whole conversation, so take a moment to make sure there's nothing here you'd rather keep private. A shared topic may include:",
+    "Anyone with the link can open this whole topic, so take a moment to make sure there's nothing here you'd rather keep private. A shared topic may include:",
   'shareModal.popover.privacyWarning.doNotShowAgain': "Don't show this again",
   'shareModal.popover.privacyWarning.items.credentials': 'Credentials',
   'shareModal.popover.privacyWarning.items.files': 'Uploaded files',
@@ -1774,7 +1881,7 @@ export default {
   'sharePage.menu.report': 'Report',
   'sharePage.meta.artifactDescription': 'An artifact shared from {{appName}}.',
   'sharePage.meta.pageDescription': 'A page shared from {{appName}}.',
-  'sharePage.meta.topicDescription': 'A conversation shared from {{appName}}.',
+  'sharePage.meta.topicDescription': 'A topic shared from {{appName}}.',
   'sharePage.pill.edit': 'Edit',
   'sharePage.pill.openInApp': 'Open in {{appName}}',
   'sharePage.pill.sharedVia': 'Shared via {{appName}}',
@@ -1784,14 +1891,21 @@ export default {
   'signalCallbacks.empty': 'No callback messages',
   'signalCallbacks.expand': 'Show details',
   'signalCallbacks.title': '{{tool}} · {{count}} callback updates',
+  'taskCompletion.title': '{{tool}} "{{description}}" finished',
+  'taskCompletion.titleWithoutDescription': '{{tool}} finished',
+  'skillViewer.files': 'Files',
+  'skillViewer.foldFiles': 'Hide files',
+  'skillViewer.unfoldFiles': 'Show files',
   'stt.action': 'Voice Input',
   'stt.loading': 'Recognizing...',
   'stt.prettifying': 'Polishing...',
+  'subAgentCallback.failed': 'Did not finish',
+  'subAgentCallback.tag': 'Sub-agent',
   'supervisor.label': 'Orchestrator',
   'supervisor.todoList.allComplete': 'All tasks completed',
   'supervisor.todoList.title': 'Tasks Completed',
   'tab.groupProfile': 'Group Profile',
-  'tab.integration': 'Channels',
+  'tab.integration': 'IM Bots',
   'tab.profile': 'Agent Profile',
   'tab.profileBasic': 'Profile',
   'tab.search': 'Search',
@@ -1810,6 +1924,7 @@ export default {
   'task.intermediateSteps': '{{count}} intermediate steps',
   'task.metrics.duration': '(took {{duration}})',
   'task.metrics.stepsShort': 'steps',
+  'task.metrics.llmCallsShort': 'LLM calls',
   'task.metrics.toolCallsShort': 'skill uses',
   'task.status.cancelled': 'Task Cancelled',
   'task.status.failed': 'Task Failed',
@@ -1920,6 +2035,7 @@ export default {
   'taskDetail.acceptanceState.rejected': 'Sent back',
   'taskDetail.acceptanceState.repairing': 'Repairing',
   'taskDetail.acceptanceState.verifying': 'Verifying',
+  'taskDetail.acceptanceWait.title': 'Waiting on acceptance',
   'taskDetail.assignee': 'Assignee',
   'taskDetail.goalTimeline.hover.cost': 'Cost',
   'taskDetail.goalTimeline.hover.duration': 'Duration',
@@ -1975,6 +2091,8 @@ export default {
   'taskDetail.runVerify.failed': 'Not passed',
   'taskDetail.runVerify.passed': 'Passed',
   'taskDetail.runVerify.pending': 'Awaiting verification',
+  'taskDetail.runVerify.repairing': 'Repairing',
+  'taskDetail.runVerify.review': 'Awaiting review',
   'taskDetail.runVerify.round': 'Round {{index}}',
   'taskDetail.runVerify.running': 'Verifying',
   'taskDetail.runExpand': 'Expand run',
@@ -2026,6 +2144,7 @@ export default {
   'taskDetail.priority.normal': 'Normal',
   'taskDetail.priority.urgent': 'Urgent',
   'taskDetail.properties': 'Properties',
+  'taskDetail.status.awaitingAcceptance': 'In acceptance',
   'taskDetail.status.backlog': 'Backlog',
   'taskDetail.status.canceled': 'Canceled',
   'taskDetail.status.completed': 'Completed',
@@ -2102,6 +2221,9 @@ export default {
   'createGoal.costBudgetPlaceholder': 'No cap',
   'createGoal.createFailed': 'Failed to create goal',
   'createGoal.back': 'Back',
+  'createGoal.agentsHint':
+    'The main agent plans and supervises the goal; tasks go to the executor, or to the main agent when none is chosen.',
+  'createGoal.agentsTitle': 'Agents',
   'createGoal.budgetTitle': 'Budget',
   'createGoal.contextLabel': 'Context for the Agent',
   'createGoal.contextHint': 'Add constraints, source material, or anything the Agent should know',
@@ -2146,6 +2268,7 @@ export default {
   'createTask.expandToInline': 'Dock to page',
   'createTask.instructionPlaceholder': 'Add task instruction...',
   'createTask.submit': 'Create task',
+  'createTask.submitScheduled': 'Create scheduled task',
   'createTask.titlePlaceholder': 'Task title',
   'createTask.visibility.changeFailed': 'Failed to change task visibility',
   'createTask.visibility.helperPrivate': 'Only you can see this task.',
@@ -2210,6 +2333,12 @@ export default {
   'goalEmpty.title': 'Chase goals without limits',
   'goalList.acceptanceProgress': '{{passed}}/{{total}} passed',
   'goalList.agentRuns': '{{count}} runs',
+  'goalList.contextMenu.copyConfirm': 'Copy',
+  'goalList.contextMenu.copyDescription':
+    'Copies the goal, its budget and acceptance criteria as a new draft. Progress, tasks and the agent are not copied; pick an agent there and start it.',
+  'goalList.contextMenu.copyFailed': 'Failed to copy goal',
+  'goalList.contextMenu.copySuccess': 'Goal copied',
+  'goalList.contextMenu.copyTitle': 'Copy goal',
   'goalList.empty': 'No goals yet',
   'goalList.taskProgress': '{{done}}/{{total}} tasks done',
   'goalList.findings': '{{count}} findings',
@@ -2253,6 +2382,8 @@ export default {
   'goalTask.step.queued': 'Not started',
   'goalList.title': 'Goals',
   'goalDetail.acceptance': 'Acceptance checks',
+  'goalDetail.agentManagedByOwner':
+    "Only the goal's creator or a Workspace admin can change its agents",
   'goalAcceptance.add': 'Add criterion',
   'goalAcceptance.edit': 'Edit',
   'goalAcceptance.empty': 'No criteria yet — add the outcomes the final acceptance should check.',
@@ -2267,8 +2398,9 @@ export default {
     '"{{title}}" will no longer gate this goal’s final acceptance.',
   'goalAcceptance.removeConfirm.title': 'Remove this criterion?',
   'goalAcceptance.title': 'Acceptance standard',
-  'goalChat.newTopic': 'New conversation',
-  'goalChat.noTopics': 'No conversations yet',
+  'goalChat.newTopic': 'New topic',
+  'goalChat.noTopics': 'No topics yet',
+  'goalChat.openTopic': 'Go to original topic',
   'goalChat.title': 'Ask about progress',
   'goalChat.welcome':
     "Ask the agent about this goal — how it's going, what's blocking, or what happens next.",
@@ -2282,6 +2414,9 @@ export default {
     'The complete task tree and latest runs for this goal.',
   'goalDetail.instruction': 'Goal instruction',
   'goalDetail.latestRuns': 'Recent executions',
+  'goalDetail.mainAgent': 'Main agent · plans and supervises this goal',
+  'goalDetail.mainAgentLabel': 'Plan',
+  'goalDetail.mainAgentUnassigned': 'Choose main agent',
   'goalDetail.closeConfirm.achieved.content':
     'Runs still in progress will be stopped and no new tasks will start. You can reopen the goal from this menu.',
   'goalDetail.closeConfirm.achieved.ok': 'Mark achieved',
@@ -2295,6 +2430,13 @@ export default {
   'goalDetail.deleteConfirm.ok': 'Delete goal',
   'goalDetail.deleteConfirm.title': 'Delete this goal?',
   'goalDetail.moreActions': 'More goal actions',
+  'goalDetail.modelFixed':
+    "This Agent's author fixed its model; only they or an admin can pick another for this goal",
+  'goalDetail.planningModel': 'Planning model · used by the main agent for planning turns',
+  'goalDetail.taskAgent': 'Executor · does the tasks under this goal',
+  'goalDetail.taskAgentFollowsMain': 'Same as main agent',
+  'goalDetail.taskAgentLabel': 'Execute',
+  'goalDetail.taskModel': "Task model · used by the goal's tasks, including unfinished ones",
   'goalDetail.metrics.planItems': 'Plan items',
   'goalDetail.metrics.progress': 'Progress',
   'goalDetail.metrics.agentRuns': 'Agent runs',
@@ -2324,14 +2466,11 @@ export default {
   'goalProcess.acceptanceHierarchy.acceptAllTitle': 'Accept every waiting acceptance?',
   'goalProcess.acceptanceHierarchy.acceptError': 'Could not save the sign-off. Try again.',
   'goalProcess.acceptanceHierarchy.accepted': 'Accepted “{{title}}”',
-  'goalProcess.acceptanceHierarchy.checksError': 'Failed to load this acceptance’s checks',
-  'goalProcess.acceptanceHierarchy.collapseAll': 'Collapse all',
   'goalProcess.acceptanceHierarchy.criterion.failed': 'Failed',
   'goalProcess.acceptanceHierarchy.criterion.passed': 'Passed',
   'goalProcess.acceptanceHierarchy.criterion.unjudged': 'Undecided',
   'goalProcess.acceptanceHierarchy.error':
     'Failed to load the acceptance levels, so no level’s standing can be read.',
-  'goalProcess.acceptanceHierarchy.expandAll': 'Expand all',
   'goalProcess.acceptanceHierarchy.group': 'Related acceptances',
   'goalProcess.acceptanceHierarchy.level.awaitingSignOff': 'Awaiting your sign-off',
   'goalProcess.acceptanceHierarchy.level.closed': 'Closed',
@@ -2339,8 +2478,6 @@ export default {
   'goalProcess.acceptanceHierarchy.level.rejected': 'Sent back',
   'goalProcess.acceptanceHierarchy.level.signedOff': 'Signed off',
   'goalProcess.acceptanceHierarchy.level.unavailable': 'No acceptance',
-  'goalProcess.acceptanceHierarchy.noChecks': 'This acceptance has no checks yet',
-  'goalProcess.acceptanceHierarchy.retry': 'Reload',
   'goalProcess.acceptanceHierarchy.tally.failed': '{{count}} failed',
   'goalProcess.acceptanceHierarchy.tally.passed': '{{count}} passed',
   'goalProcess.acceptanceHierarchy.tally.unjudged': '{{count}} undecided',
@@ -2371,6 +2508,22 @@ export default {
   'goalProcess.northStar.record.valueLabel': 'Current value of {{key}}',
   'goalProcess.northStar.record.submit': 'Record',
   'goalProcess.northStar.record.failed': 'Failed to record the observation',
+  'goalProcess.northStar.detail.history': 'Observations ({{count}})',
+  'goalProcess.northStar.detail.removed': 'This metric is no longer declared on the goal',
+  'goalProcess.northStar.detail.source.agent': 'Recorded by agent',
+  'goalProcess.northStar.detail.source.api': 'Written via API',
+  'goalProcess.northStar.detail.source.manual': 'Recorded manually',
+  'goalProcess.northStar.detail.source.probe': 'Collected',
+  'goalProcess.northStar.detail.target': 'Target',
+  'goalProcess.northStar.detail.title': 'Metric',
+  'goalProcess.northStar.detail.trend': 'Trend',
+  'goalProcess.northStar.detail.trendEmpty': 'The trend appears after a second observation',
+  'goalProcess.northStar.edit.submit': 'Save',
+  'goalProcess.northStar.edit.title': 'Adjust target',
+  'goalProcess.northStar.remove.confirm':
+    'Remove "{{name}}"? It will no longer gate this goal\'s acceptance. Recorded observations are kept.',
+  'goalProcess.northStar.remove.failed': 'Failed to remove the metric',
+  'goalProcess.northStar.remove.title': 'Remove metric',
   'goalProcess.frontier.add': 'Add task',
   'goalProcess.frontier.needsYou': '{{count}} need you',
   'goalProcess.frontier.advanceable': '{{count}} can advance',
@@ -2395,6 +2548,7 @@ export default {
     'The coordinator is breaking the goal into executable tasks — they will appear here shortly.',
   'goalProcess.result.followUp.placeholder': 'Ask about this result, or what to do next…',
   'goalProcess.result.followUp.send': 'Send to the goal conversation',
+  'goalProcess.result.followUp.trigger': 'Follow up',
   'goalProcess.tag.needsDecision': 'Needs your decision',
   'goalProcess.acceptance.repairing': 'Repairing',
   'goalProcess.acceptance.verifying': 'Verifying',
@@ -2403,7 +2557,8 @@ export default {
   'goalProcess.acceptance.errored': 'Verification error',
   'goalProcess.acceptance.rejected': 'Rejected',
   'goalProcess.tag.verifying': 'Verifying',
-  'goalProcess.tag.lost': 'Lost',
+  'goalProcess.tag.stalled': 'Stalled',
+  'goalProcess.tag.waitingQuota': 'Waiting for quota',
   'goalProcess.tag.done': 'Done',
   'goalProcess.tag.retired': 'Retired',
   'goalProcess.gate.decisionPointLabel': 'What needs your decision',
@@ -2425,10 +2580,14 @@ export default {
   'goalProcess.gate.reason.verifyInternalError':
     'Verification could not run (internal error); this delivery was not evaluated',
   'goalProcess.gate.reason.verifyFailed': 'Task {{id}} did not pass verification',
+  'goalProcess.gate.reason.verifyStalled':
+    'Task {{id}} failed verification the same way {{count}} times in a row, so it was not retried again',
   'goalProcess.gate.reason.goalAcceptanceFailed': 'Goal-level acceptance did not pass',
   'goalProcess.gate.reason.attemptBudgetExhausted': 'The attempt budget for this work is used up',
   'goalProcess.gate.reason.costBudgetExhausted': 'The goal cost budget is used up',
   'goalProcess.gate.reason.recoveryFailed': 'Automatic recovery could not start the next attempt',
+  'goalProcess.gate.reason.recoveryFailedWithError':
+    'Automatic recovery could not start the next attempt: {{error}}',
   'goalProcess.gate.reason.batchReleaseProbes':
     'The v{{revision}} experiments finished; start batch execution with wave {{wave}} ({{count}} units)',
   'goalProcess.gate.reason.batchReleaseRevised':
@@ -2499,6 +2658,10 @@ export default {
   'goalProcess.decision.attempts_other': '{{count}} attempts',
   'goalProcess.decision.effect.retry':
     'Send the task back for another attempt. Your note is written into its instructions.',
+  'goalProcess.decision.effect.alsoRetires': 'Also drops the tasks that depend on it: {{tasks}}.',
+  'goalProcess.decision.effect.quotedTask': '"{{title}}"',
+  'goalProcess.decision.effect.retireWithDependents':
+    'Drop this task and the tasks that depend on it ({{tasks}}). The goal moves on without them.',
   'goalProcess.decision.effect.retire': 'Drop this task. The goal moves on without it.',
   'goalProcess.decision.effect.fail': 'End the goal and record it as failed.',
   'goalProcess.decision.effect.retryAcceptance': 'Run the goal-level acceptance again.',
@@ -2513,15 +2676,13 @@ export default {
   'goalProcess.decision.effect.releaseBatch':
     'Release the next wave on the current recipe. Each later wave goes to the main Agent, which releases it or brings it back to you.',
   'goalProcess.signOff.islandSubtitle': 'is done and waiting for your sign-off',
-  'goalProcess.signOff.question': 'Do you accept what this goal delivered?',
+  'goalProcess.signOff.islandSummary':
+    'Goal-level acceptance passed. Read the delivery report, then sign off or request changes.',
+  'goalProcess.signOff.openReport': 'View details',
   'goalProcess.signOff.description': 'Goal-level acceptance passed. Your sign-off closes the goal.',
   'goalProcess.signOff.accept': 'Sign off',
   'goalProcess.signOff.acceptEffect': 'Close the goal as delivered.',
   'goalProcess.signOff.requestChanges': 'Request changes',
-  'goalProcess.signOff.requestChangesEffect':
-    'Send it back to the Agent. Say what to change in the notes.',
-  'goalProcess.signOff.notePlaceholder':
-    'What should change? The Agent reworks the delivery with this.',
   'goalProcess.signOff.accepted': 'Signed off',
   'goalProcess.signOff.sentBack': 'Sent back for changes',
   'goalProcess.gate.title.agentQuestion': "Answer the main Agent's question",
@@ -2531,8 +2692,12 @@ export default {
   'goalProcess.attempts.failed': 'Did not pass',
   'goalProcess.attempts.retired': 'Retired',
   'goalProcess.attempts.running': 'Running',
-  'goalProcess.stale.description':
-    'No heartbeat for {{duration}}. The next advance marks this attempt lost and starts a fresh one — it does not count as a failure.',
+  'goalProcess.stalled.description':
+    'Last heartbeat {{duration}}. The next advance restarts this attempt — it does not count as a failure.',
+  'goalProcess.quota.resumeAt': 'Resumes {{time}}',
+  'goalProcess.quota.resumeSoon': 'Resuming soon',
+  'goalProcess.quota.tooltip':
+    'The usage limit was reached. The goal resumes this task on its own once the quota resets — it does not count as a failure.',
   'goalProcess.running.elapsed': 'Running {{duration}}',
   'goalProcess.graph.title': 'Exploration map',
   'goalProcess.graph.view.stage': 'Current stage',
@@ -2541,7 +2706,10 @@ export default {
   'goalProcess.graph.exitFullscreen': 'Exit fullscreen',
   'goalProcess.graph.bridgeHops_one': 'via {{count}} step not shown',
   'goalProcess.graph.bridgeHops_other': 'via {{count}} steps not shown',
+  'goalProcess.linked.checkFailed': 'Status unconfirmed — tap to retry',
+  'goalProcess.linked.checking': 'Confirming status…',
   'goalProcess.linked.open': 'Open goal progress',
+  'goalProcess.linked.retry': 'Retry confirming the goal status',
   'goalProcess.portal.openPage': 'Open goal page',
   'goalProcess.portal.title': 'Goal',
   'goalProcess.result.changes.comment': 'Your feedback',
@@ -2552,7 +2720,6 @@ export default {
   'goalProcess.result.continueSeed.open': 'Still open:',
   'goalProcess.result.continueSeed.requirement': 'Original requirement:',
   'goalProcess.result.continueSeed.title': 'Continue: {{title}}',
-  'goalProcess.result.criteria.document': 'Evidence document',
   'goalProcess.result.criteria.empty': 'This Goal has no structured acceptance criteria.',
   'goalProcess.result.criteria.evidenceCount': '{{count}} evidence',
   'goalProcess.result.criteria.state.failed': 'Not met',
@@ -2603,6 +2770,7 @@ export default {
   'goalProcess.result.nav.document': 'Final document',
   'goalProcess.result.nav.label': 'Jump to section',
   'goalProcess.result.nav.overview': 'Overview',
+  'goalProcess.result.nav.report': 'Report',
   'goalProcess.result.requirement': 'Original requirement',
   'goalProcess.result.scale.cost': 'Spent {{cost}}',
   'goalProcess.result.scale.criteria': '{{met}}/{{total}} criteria met',
@@ -2638,6 +2806,7 @@ export default {
   'goalProcess.result.unfinished.nextSteps': 'Suggested next steps',
   'goalProcess.result.unfinished.title': 'Not done / next steps',
   'goalProcess.result.unfinished.unmetCriteria': 'Unmet criteria',
+  'goalProcess.result.report.expand': 'View full screen',
   'goalProcess.result.story.chapterMissing':
     'This chapter is no longer in the report — it may have been rewritten.',
   'goalProcess.result.story.detourKind.dead_end': 'Dead end',
@@ -2728,7 +2897,6 @@ export default {
   'goalProcess.metricDetail.budget.perTaskEmpty': 'No run has been billed yet.',
   'goalProcess.metricDetail.budget.perTaskTitle': 'Where it went',
   'goalProcess.metricDetail.budget.runsValue': '{{count}} runs',
-  'goalProcess.metricDetail.budget.tokensValue': '{{value}} tokens',
   'goalProcess.metricDetail.budget.raiseNote':
     'Raising a cap is what restarts a goal the coordinator parked on its budget \u2014 it starts moving again on its own, no Resume needed. Leave a field empty to run uncapped.',
   'goalProcess.metricDetail.budget.rounds': 'Rounds',
@@ -2781,6 +2949,16 @@ export default {
   'goalProcess.node.artifactsTooltip':
     '{{count}} work versions registered. Opening them needs a server read that does not exist yet.',
   'goalProcess.node.humanTouched': 'You took part in this task',
+  'goalProcess.decisions.title': 'Decisions',
+  'goalProcess.decisions.empty': 'No decision has been asked on this goal yet.',
+  'goalProcess.decisions.pending': 'Awaiting decision',
+  'goalProcess.decisions.chosen': 'Chosen',
+  'goalProcess.decisions.openNode': 'Open this decision',
+  'goalProcess.decisions.recommended': 'Recommended',
+  'goalProcess.decisions.raisedBy': 'Raised by',
+  'goalProcess.decisions.effect.fail': 'Fails the goal',
+  'goalProcess.decisions.effect.retire': 'Retires the task',
+  'goalProcess.decisions.effect.retry': 'Runs the task again',
   'goalProcess.findings.title': 'Findings',
   'goalProcess.findings.empty': 'No findings yet.',
   'goalProcess.findings.answers': 'Answers “{{title}}”',
@@ -2807,6 +2985,8 @@ export default {
   'goalProcess.start': 'Start',
   'goalPage.allGoals': 'All goals',
   'goalPage.activeGoals': 'Open goals',
+  'goalPage.agentFilter.all': 'All agents',
+  'goalPage.agentFilter.title': 'Filter by agent',
   'goalPage.description':
     'Track what this agent is pursuing and how close each goal is to acceptance.',
   'goalPage.create': 'Create goal',
@@ -2844,6 +3024,11 @@ export default {
   'goalTurn.trigger.takeover': 'Takeover',
   'taskList.activeTasks': 'Active Tasks',
   'taskList.all': 'All tasks',
+  'taskList.completedTasks.all': 'All',
+  'taskList.completedTasks.day': 'Past day',
+  'taskList.completedTasks.month': 'Past month',
+  'taskList.completedTasks.none': 'None',
+  'taskList.completedTasks.week': 'Past week',
   'taskList.archived': 'Archived',
   'taskList.visibility.all': 'All',
   'taskList.visibility.label': 'Visibility',
@@ -2852,12 +3037,12 @@ export default {
   'taskList.emptyHero.greeting': 'What should we tackle today?',
   'taskList.emptyHero.templatesTitle': 'Templates picked for you',
   'taskList.form.columns': 'Columns',
+  'taskList.form.completedTasks': 'Completed & canceled',
   'taskList.form.grouping': 'Grouping',
   'taskList.form.nestedSubTasks': 'Nested sub-tasks',
   'taskList.form.orderCompletedByRecency': 'Sort completed tasks by recency',
   'taskList.form.ordering': 'Ordering',
   'taskList.form.showArchived': 'Show archived',
-  'taskList.form.showCompleted': 'Show completed & canceled',
   'taskList.form.showSubTasks': 'Show sub-tasks',
   'taskList.form.subGrouping': 'Sub-grouping',
   'taskList.hiddenCompleted.count_one': '{{count}} task',
@@ -2902,6 +3087,8 @@ export default {
     'This task is part of an active goal. Finish or close the goal before archiving it.',
   'taskList.contextMenu.archiveFailed':
     "Couldn't update the archive state. Refresh the task and try again.",
+  'taskList.contextMenu.archiveDenied.noEditPermission':
+    "You don't have permission to edit tasks in this workspace. Ask a workspace admin for access.",
   'taskList.contextMenu.archiveBlocked':
     'Stop the running task or its schedule/heartbeat before archiving it',
   'taskList.contextMenu.archiveSuccess': 'Task archived',
@@ -2909,6 +3096,8 @@ export default {
   'taskList.contextMenu.copyDescription':
     'Clone this task (and all its subtasks) into another workspace. Status resets to backlog.',
   'taskList.contextMenu.copyFailed': 'Failed to copy task',
+  'taskList.contextMenu.copyContent': 'Copy Content',
+  'taskList.contextMenu.copyContentSuccess': 'Content copied',
   'taskList.contextMenu.copyId': 'Copy ID',
   'taskList.contextMenu.copyIdSuccess': 'ID copied',
   'taskList.contextMenu.copyLink': 'Copy Link',
@@ -2957,17 +3146,17 @@ export default {
   'thread.subagentMetrics.toolsShort_one': '{{count}} tool',
   'thread.subagentMetrics.toolsShort_other': '{{count}} tools',
   'transferMigration.agentBanner.desc':
-    'New conversations are unaffected; older ones light up one by one as they finish. Opening a pending conversation moves it to the front.',
+    'New topics are unaffected; older ones light up one by one as they finish. Opening a pending topic moves it to the front.',
   'transferMigration.agentBadge': 'Migrating history · {{completed}}/{{total}}',
   'transferMigration.agentBadgeCopy': 'Copying history · {{completed}}/{{total}}',
-  'transferMigration.topicPending.title': 'This conversation is migrating',
-  'transferMigration.topicPendingCopy.title': 'This conversation is copying',
+  'transferMigration.topicPending.title': 'This topic is migrating',
+  'transferMigration.topicPendingCopy.title': 'This topic is copying',
   'transferMigration.topicPending.desc':
     'We are prioritizing it — its history will appear here in a few seconds, no action needed.',
   'transferMigration.inputDisabledHint':
-    'You can continue this conversation once its history finishes migrating',
+    'You can continue chatting in this topic once its history finishes migrating',
   'transferMigration.inputDisabledHintCopy':
-    'You can continue this conversation once its history finishes copying',
+    'You can continue chatting in this topic once its history finishes copying',
   'thread.subagentReadOnlyHint':
     'SubAgent conversations are read-only — execution is driven by the parent agent.',
   'terminalPanel.close': 'Close terminal panel',
@@ -3020,7 +3209,8 @@ export default {
   'tool.intervention.mode.autoRun': 'Auto Approve',
   'tool.intervention.mode.autoRunDesc': 'Automatically approve all tool executions',
   'tool.intervention.mode.manual': 'Manual',
-  'tool.intervention.mode.manualDesc': 'Manual approval required for each invocation',
+  'tool.intervention.mode.manualDesc':
+    'Asks before each invocation, except actions you chose not to be asked about again',
   'tool.intervention.onboarding.agentIdentity.editHint':
     'You can edit the name or avatar directly below.',
   'tool.intervention.onboarding.agentIdentity.namePlaceholder': 'Agent name',
@@ -3137,6 +3327,8 @@ export default {
   'upload.preview.status.processing': 'Processing file...',
   'upload.preview.status.success': 'Upload complete',
   'upload.preview.status.uploading': 'Uploading file...',
+  'upload.validation.heteroImageNotSupported':
+    "{{name}} can't read images, so {{file}} was not added. Use an agent that supports images instead.",
   'upload.validation.mediaNotSupported':
     'The current model cannot read these media files, so they were not added: {{files}}. Switch to a model that supports them, or upload a different file type.',
   'upload.validation.unsupportedFileType':
@@ -3368,6 +3560,7 @@ export default {
   'workingPanel.overview.ports.copy': 'Copy link',
   'workingPanel.overview.ports.createFailed': 'Could not expose the port',
   'workingPanel.overview.ports.detected.available': '{{count}} to open',
+  'workingPanel.overview.ports.detected.checking': 'Checking which ports are running…',
   'workingPanel.overview.ports.detected.expose': 'Open',
   'workingPanel.overview.ports.detected.heading': 'Detected',
   'workingPanel.overview.ports.detected.hideOthers': 'Hide other ports',
@@ -3456,6 +3649,8 @@ export default {
   'workingPanel.works.emptyVersions': 'No versions yet',
   'workingPanel.works.error': 'Failed to load works',
   'workingPanel.works.documentLoadError': 'Failed to load document',
+  'workingPanel.works.canvasShared': 'Shared',
+  'workingPanel.works.canvasUntitled': 'Untitled canvas',
   'workingPanel.works.changeType.created': 'Created',
   'workingPanel.works.changeType.updated': 'Updated',
   'workingPanel.works.documentDeleted': 'This document has been deleted',
@@ -3671,16 +3866,33 @@ export default {
   'workingPanel.files.filters.title': 'Filter Files',
   'workingPanel.files.noSearchResults': 'No matching files',
   'workingPanel.files.open': 'Open File',
+  'workingPanel.files.partialIndexNotice':
+    'Only part of this large project is shown — refresh to load every file',
+  'workingPanel.files.refreshFailed': "Couldn't refresh this view — showing the last saved files",
   'workingPanel.files.search': 'Search Files',
   'workingPanel.files.searchPlaceholder': 'Filter files...',
   'workingPanel.files.showInReview': 'Show in Review',
   'workingPanel.files.showInSystem': 'Reveal in Folder',
   'workingPanel.files.title': 'Files',
+  'workingPanel.search.empty': 'No messages contain "{{keyword}}"',
+  'workingPanel.search.error': 'Search failed. Try again.',
+  'workingPanel.search.hint':
+    'Searches every message in this topic, including earlier history that is not loaded yet.',
+  'workingPanel.search.limitReached':
+    'Showing the first {{count}} messages. Use a more specific keyword to narrow it down.',
+  'workingPanel.search.next': 'Next match',
+  'workingPanel.search.placeholder': 'Find in this topic',
+  'workingPanel.search.prev': 'Previous match',
+  'workingPanel.search.resultCount_one': '{{count}} message',
+  'workingPanel.search.resultCount_other': '{{count}} messages',
+  'workingPanel.search.retry': 'Retry',
+  'workingPanel.search.role.assistant': 'Assistant',
+  'workingPanel.search.role.user': 'You',
+  'workingPanel.search.title': 'Search',
   'workingPanel.files.truncatedNotice':
     'Some expanded folders are too large to list fully — only the first entries are shown',
   'workingPanel.files.views.changes': 'Git Changes',
   'workingPanel.files.views.project': 'Project',
-  'workingPanel.files.views.title': 'File View',
   'workingPanel.pr.action.arming': 'Arming auto-merge…',
   'workingPanel.pr.action.autoMerge': 'Auto-merge when ready',
   'workingPanel.pr.action.bypassSuffix': 'bypass rules',
@@ -3900,4 +4112,42 @@ export default {
   'userFeedbackCard.count_other': '{{count}} comments',
   'userFeedbackCard.title': 'User feedback',
   'you': 'You',
+  'sandboxDrive.pickerTitle': 'Working directory',
+  'sandboxDrive.pickerInfoTooltip':
+    'Pick a folder on your drive and its files are kept across conversations. Without one, the sandbox is temporary.',
+  'sandboxDrive.manageEnvironments': 'Environments',
+  'sandboxEnvironment.title': 'Environment',
+  'sandboxEnvironment.hint':
+    'Cloned and set up once in the working directory before the first command. A folder that already has files is left as it is.',
+  'sandboxEnvironment.none': 'No environment',
+  'sandboxEnvironment.noneDesc': 'Start from an empty working directory',
+  'sandboxEnvironment.empty': 'No environments yet. Create one in Environments.',
+  'sandboxEnvironment.missing': 'Environment unavailable',
+  'sandboxEnvironment.loading': 'Loading environment…',
+  'sandboxEnvironment.loadFailed': "Couldn't load environments",
+  'sandboxEnvironment.retry': 'Retry',
+  'sandboxEnvironment.saveFailed': 'Could not change the environment. Try again.',
+  'sandboxDrive.root': 'Drive root',
+  'sandboxDrive.building': '{{name}} · building',
+  'sandboxDrive.browse': 'Choose a folder on your drive…',
+  'sandboxDrive.browseOther': 'Choose another folder…',
+  'sandboxDrive.browseDesc': 'Files in it are kept across conversations',
+  'sandboxDrive.folderDesc': 'Folder on your drive · {{path}}',
+  'sandboxDrive.environmentDesc': 'Environment directory · installed packages are kept too',
+  'sandboxDrive.environmentBuildingDesc':
+    'Environment directory · building, usable once it finishes',
+  'sandboxDrive.upsell': 'Keep files on a drive',
+  'sandboxDrive.fallback.directoryMissing':
+    'This folder no longer exists on the drive. Runs use a temporary sandbox until you pick another folder.',
+  'sandboxDrive.fallback.instanceUnavailable':
+    'This environment directory can’t be used here any more. Runs use a temporary sandbox until you pick another one.',
+  'sandboxDrive.fallback.rootNotAllowed':
+    'The public drive’s root cannot be a working folder. This run will use a temporary sandbox; pick a folder.',
+  'sandboxDrive.fallbackChip.directoryMissing': 'Folder no longer exists',
+  'sandboxDrive.fallbackChip.instanceUnavailable': 'Environment unavailable',
+  'sandboxDrive.fallbackChip.rootNotAllowed': 'Pick a folder',
+  'sandboxDrive.fallback.instanceRebuildRequired':
+    'This private environment directory is still on the public drive and needs to be rebuilt on your personal drive. This run will use a temporary sandbox.',
+  'sandboxDrive.fallbackChip.instanceRebuildRequired': 'Rebuild on personal drive',
+  'sandboxDrive.folderOnDriveDesc': '{{drive}} · {{path}}',
 };

@@ -23,6 +23,7 @@ import {
   getAttachmentFileIdsFromEditor,
   pickAndInsertAttachments,
 } from '@/features/EditorCanvas/editorAttachments';
+import { releaseEditorSelection } from '@/features/EditorCanvas/releaseEditorSelection';
 import { usePermission } from '@/hooks/usePermission';
 import { useGlobalStore } from '@/store/global';
 import { useTaskStore } from '@/store/task';
@@ -41,6 +42,12 @@ import { UnassignedAssigneeIcon } from '../features/UnassignedAssigneeIcon';
 import { useAgentDisplayMeta } from '../shared/useAgentDisplayMeta';
 import { useAgentVisibility } from '../shared/useAgentVisibility';
 import { useUserDisplayMeta } from '../shared/useUserDisplayMeta';
+import ScheduleChip from './ScheduleChip';
+import {
+  createDefaultScheduleDraft,
+  type ScheduleDraft,
+  toScheduledCreateParams,
+} from './scheduleDraft';
 import { useTitleEnterToInstruction } from './useTitleEnterToInstruction';
 
 export interface CreateTaskContentProps {
@@ -52,8 +59,13 @@ export interface CreateTaskContentProps {
    * agent-scoped task list where every task belongs to that agent.
    */
   lockAssignee?: boolean;
-  onCreated?: (task: { agentId?: string; identifier: string; name?: string }) => void;
+  onCreated?: (task: { id: string; agentId?: string; identifier: string; name?: string }) => void;
   projectId?: string;
+  /**
+   * Creates a scheduled task: the form gains a schedule chip and the task is
+   * created with that schedule already on. Used by the Scheduled tasks tab.
+   */
+  schedule?: boolean;
   /**
    * Whether to show the "minimize to inline entry" button. Only the list view has an
    * inline entry target, so contexts like the Kanban board pass `false` to hide it.
@@ -68,6 +80,7 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
     lockAssignee,
     onCreated,
     projectId,
+    schedule: isScheduled = false,
     showInlineToggle = true,
   }) => {
     const { t } = useTranslation('chat');
@@ -92,6 +105,7 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
     // and going private stays one click away. In personal mode the field is
     // irrelevant and the chip is hidden anyway.
     const [visibility, setVisibility] = useState<'private' | 'public'>('public');
+    const [scheduleDraft, setScheduleDraft] = useState<ScheduleDraft>(createDefaultScheduleDraft);
 
     const assigneeVisibility = useAgentVisibility(assigneeAgentId);
     const isPrivateAgent = assigneeVisibility === 'private';
@@ -160,15 +174,17 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
 
       const editorJson = editor?.getDocument?.('json') as unknown;
 
+      // Only present when the user pinned a run location / directory —
+      // otherwise the task inherits the assignee agent entirely.
+      const config = execution ? { execution: toTaskExecutionConfigPatch(execution) } : undefined;
+
       // `createTask` keeps its rejecting contract; surface the failure here so a
       // failed create isn't silent and the modal stays open with its content.
       try {
         const result = await createTask({
           assigneeAgentId,
           assigneeUserId,
-          // Only present when the user pinned a run location / directory —
-          // otherwise the task inherits the assignee agent entirely.
-          ...(execution ? { config: { execution: toTaskExecutionConfigPatch(execution) } } : {}),
+          ...(isScheduled ? toScheduledCreateParams(scheduleDraft, config) : { config }),
           editorData: editorJson,
           instruction: instruction || title.trim(),
           name: title.trim() || undefined,
@@ -181,6 +197,7 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
         if (result) {
           close();
           onCreated?.({
+            id: result.id,
             agentId: result.assigneeAgentId ?? undefined,
             identifier: result.identifier,
             name: result.name ?? undefined,
@@ -198,9 +215,11 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
       execution,
       createTask,
       editor,
+      isScheduled,
       onCreated,
       priority,
       projectId,
+      scheduleDraft,
       t,
       title,
       visibility,
@@ -221,41 +240,39 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
 
     const handleTitleKeyDown = useTitleEnterToInstruction(editor);
 
+    // An image pasted into the instruction finishes uploading later; without
+    // this, that update would move the caret back from the title mid-typing.
+    const handleTitleFocus = useCallback(() => releaseEditorSelection(editor), [editor]);
+
     return (
       <Flexbox flex={1} style={{ minHeight: 0 }} onKeyDown={handleKeyDown}>
-        <Flexbox horizontal style={{ minHeight: 0, padding: '16px 24px 0' }}>
-          {/* A block (not flex) scroller: the editor's overflow-hidden wrapper
-              would otherwise shrink to fit and clip instead of scrolling. */}
-          <div style={{ flex: 1, minHeight: 180, minWidth: 0, overflowY: 'auto' }}>
-            <input
-              autoFocus={canCreateTask}
-              disabled={!canCreateTask}
-              placeholder={t('createTask.titlePlaceholder')}
-              value={title}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'inherit',
-                fontFamily: 'inherit',
-                fontSize: 20,
-                fontWeight: 600,
-                lineHeight: 1.4,
-                outline: 'none',
-                padding: '4px 0',
-                width: '100%',
-              }}
-              onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={handleTitleKeyDown}
-            />
-            <EditorCanvas
-              disabled={!canCreateTask}
-              editor={editor}
-              floatingToolbar={false}
-              placeholder={t('createTask.instructionPlaceholder')}
-              style={{ fontSize: 14, paddingBottom: 16 }}
-              onContentChange={handleContentChange}
-            />
-          </div>
+        <Flexbox
+          horizontal
+          align={'center'}
+          gap={8}
+          style={{ flexShrink: 0, padding: '16px 24px 0' }}
+        >
+          <input
+            autoFocus={canCreateTask}
+            disabled={!canCreateTask}
+            placeholder={t('createTask.titlePlaceholder')}
+            value={title}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'inherit',
+              flex: 1,
+              fontFamily: 'inherit',
+              fontSize: 20,
+              fontWeight: 600,
+              lineHeight: 1.4,
+              minWidth: 0,
+              padding: '4px 0',
+            }}
+            onChange={(e) => setTitle(e.target.value)}
+            onFocus={handleTitleFocus}
+            onKeyDown={handleTitleKeyDown}
+          />
           <Flexbox horizontal gap={4} style={{ flexShrink: 0 }}>
             {showInlineToggle && (
               <ActionIcon
@@ -268,6 +285,23 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
           </Flexbox>
         </Flexbox>
 
+        {/* Only the instruction scrolls; the title row above stays pinned. A
+            full-width block (not flex) scroller keeps the scrollbar on the
+            modal's right edge; as a flex item the editor's overflow-hidden
+            wrapper would shrink to fit and clip instead of scrolling. */}
+        <div style={{ minHeight: 0, overflowY: 'auto' }}>
+          <div style={{ minHeight: 144, padding: '0 24px' }}>
+            <EditorCanvas
+              disabled={!canCreateTask}
+              editor={editor}
+              floatingToolbar={false}
+              placeholder={t('createTask.instructionPlaceholder')}
+              style={{ fontSize: 14, paddingBottom: 16 }}
+              onContentChange={handleContentChange}
+            />
+          </div>
+        </div>
+
         <Flexbox
           horizontal
           align={'center'}
@@ -279,6 +313,14 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
           }}
         >
           <Flexbox horizontal gap={2} wrap={'wrap'}>
+            {isScheduled && (
+              <ScheduleChip
+                disabled={!canCreateTask}
+                value={scheduleDraft}
+                onChange={setScheduleDraft}
+              />
+            )}
+
             <TaskPriorityTag priority={priority} onChange={setPriority}>
               <Block
                 clickable
@@ -425,7 +467,7 @@ const CreateTaskContent = memo<CreateTaskContentProps>(
             type={'primary'}
             onClick={handleSubmit}
           >
-            {t('createTask.submit')}
+            {t(isScheduled ? 'createTask.submitScheduled' : 'createTask.submit')}
           </Button>
         </Flexbox>
       </Flexbox>

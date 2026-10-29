@@ -2,7 +2,6 @@
 
 import {
   Accordion,
-  Avatar,
   Button,
   Checkbox,
   createStaticStyles,
@@ -11,6 +10,7 @@ import {
   Empty,
   Flexbox,
   List,
+  ModalFooter,
   SearchBar,
   stopPropagation,
   Switch,
@@ -23,6 +23,7 @@ import { type ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import AgentAvatar from '@/components/AgentAvatar';
 import ImperativeModal from '@/components/ImperativeModal';
 import { DEFAULT_AVATAR } from '@/const/meta';
 import GroupAvatar from '@/features/GroupAvatar';
@@ -67,7 +68,7 @@ const TemplateItem = memo<{
             {template.description}
           </Text>
           <Flexbox horizontal align="center" gap={4}>
-            <Users size={11} style={{ color: '#999' }} />
+            <Users size={11} style={{ color: cssVar.colorTextTertiary }} />
             <Text style={{ fontSize: 11 }} type="secondary">
               {t('groupWizard.memberCount', {
                 count: template.members.filter((member) => member !== null && member !== undefined)
@@ -92,7 +93,7 @@ const ExistingMemberItem = memo<{
   const agentId = agent.config?.id;
   const title = agent.meta?.title || t('defaultSession', { ns: 'common' });
   const description = agent.meta?.description || '';
-  const avatar = agent.meta?.avatar || DEFAULT_AVATAR;
+  const avatar = agent.meta?.avatar;
   const avatarBackground = agent.meta?.backgroundColor;
 
   if (!agentId) return null;
@@ -105,7 +106,14 @@ const ExistingMemberItem = memo<{
           onChange={() => onToggle(agentId)}
           onClick={stopPropagation}
         />
-        <Avatar avatar={avatar} background={avatarBackground} size={40} />
+        <AgentAvatar
+          agentId={agentId}
+          avatar={avatar}
+          background={avatarBackground}
+          name={title}
+          shape={'circle'}
+          size={40}
+        />
         <Flexbox flex={1} gap={2} style={{ minWidth: 0 }}>
           <Text className={styles.title}>{title}</Text>
           {description && (
@@ -423,7 +431,7 @@ const ChatGroupWizard = memo<ChatGroupWizardProps>(
       return template.members
         .filter((member) => member !== null && member !== undefined)
         .map((member) => ({
-          avatar: member.avatar || DEFAULT_AVATAR,
+          avatar: member.avatar,
           backgroundColor: member.backgroundColor,
           description: member.systemRole,
           isRemoved: removedForTemplate.has(member.title),
@@ -445,7 +453,7 @@ const ChatGroupWizard = memo<ChatGroupWizardProps>(
           if (!agent) return null;
 
           const title = agent.meta?.title || t('defaultSession', { ns: 'common' });
-          const avatar = agent.meta?.avatar || DEFAULT_AVATAR;
+          const avatar = agent.meta?.avatar;
           const avatarBackground = agent.meta?.backgroundColor;
           const description = agent.meta?.description || '';
 
@@ -459,7 +467,16 @@ const ChatGroupWizard = memo<ChatGroupWizardProps>(
                 }}
               />
             ),
-            avatar: <Avatar avatar={avatar} background={avatarBackground} size={40} />,
+            avatar: (
+              <AgentAvatar
+                agentId={agentId}
+                avatar={avatar}
+                background={avatarBackground}
+                name={title}
+                shape={'circle'}
+                size={40}
+              />
+            ),
             description: description ? (
               <Tooltip title={description}>
                 <Text className={memberDescriptionClass} ellipsis={{ rows: 1 }}>
@@ -544,7 +561,7 @@ const ChatGroupWizard = memo<ChatGroupWizardProps>(
         title={t('groupWizard.title')}
         width={900}
         footer={
-          <Flexbox horizontal gap={8} justify="end">
+          <ModalFooter>
             <Button onClick={handleCancel}>{t('cancel', { ns: 'common' })}</Button>
             <Button
               disabled={confirmDisabled}
@@ -554,7 +571,7 @@ const ChatGroupWizard = memo<ChatGroupWizardProps>(
             >
               {t('groupWizard.createGroup')}
             </Button>
-          </Flexbox>
+          </ModalFooter>
         }
         onCancel={handleCancel}
       >
@@ -656,7 +673,7 @@ const ChatGroupWizard = memo<ChatGroupWizardProps>(
                     {t('groupWizard.host.title')}
                   </Text>
                   <Text
-                    style={{ color: '#999', fontSize: 12 }}
+                    style={{ color: cssVar.colorTextTertiary, fontSize: 12 }}
                     type={isHostRemoved ? 'secondary' : undefined}
                   >
                     {t('groupWizard.host.description')}
@@ -699,9 +716,11 @@ const ChatGroupWizard = memo<ChatGroupWizardProps>(
                           />
                         ),
                         avatar: (
-                          <Avatar
+                          <AgentAvatar
                             avatar={member.avatar}
                             background={member.backgroundColor}
+                            name={member.title}
+                            shape={'circle'}
                             size={40}
                           />
                         ),

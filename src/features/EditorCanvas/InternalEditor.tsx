@@ -3,6 +3,9 @@
 import { isDesktop } from '@lobechat/const';
 import type { IEditor } from '@lobehub/editor';
 import {
+  ReactAlertPlugin,
+  ReactChartPlugin,
+  ReactFootnotePlugin,
   ReactImagePlugin,
   ReactLinkPlugin,
   ReactLiteXmlPlugin,
@@ -26,6 +29,7 @@ import InlineToolbar from './InlineToolbar';
 import LinearFilePlugin from './LinearFilePlugin';
 import { registerAttachmentClickOpen } from './registerAttachmentClickOpen';
 import { registerBlockDecoratorCaretGuard } from './registerBlockDecoratorCaretGuard';
+import { registerImageFilePastePreference } from './registerImageFilePastePreference';
 import { needsImageRehost, rehostImage } from './rehostImage';
 import { useFileUpload, useImageUpload } from './useImageUpload';
 
@@ -57,6 +61,9 @@ const STATIC_PLUGINS = [
   // comment editors, so a chip serialises identically in every canvas.
   Editor.withProps(ReactMentionPlugin, { markdownWriter: writeTopicCommentMentionMarkdown }),
   ReactTablePlugin,
+  ReactAlertPlugin,
+  ReactFootnotePlugin,
+  ReactChartPlugin,
 ];
 
 const EDITOR_INIT_DATA_SOURCE_TYPES = ['json', 'markdown'] as const;
@@ -262,6 +269,14 @@ const InternalEditor = memo<InternalEditorProps>(
     useEffect(() => {
       if (!editor) return;
       const unregister = registerAttachmentClickOpen(editor);
+      return () => unregister?.();
+    }, [editor]);
+
+    // Copy Image from apps like Discord puts an image-only HTML flavor next to
+    // the bitmap; upload the bitmap instead of rehosting the remote URL.
+    useEffect(() => {
+      if (!editor) return;
+      const unregister = registerImageFilePastePreference(editor);
       return () => unregister?.();
     }, [editor]);
 

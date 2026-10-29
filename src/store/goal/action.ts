@@ -28,6 +28,7 @@ import {
   type GoalListValue,
   goalMetricSeriesResource,
   homeGoalListResource,
+  topicGoalListResource,
 } from './projection';
 
 /**
@@ -152,13 +153,21 @@ const useGoalCoordinatorAdvancing = (goalId?: string | null): boolean =>
 /** A conversation rarely plans more than one goal; this only bounds a runaway topic. */
 const TOPIC_GOAL_FETCH_LIMIT = 20;
 
-const topicGoalsRefreshInterval = (
-  result: { goals: { goal: { status: GoalStatus } }[] } | undefined,
-  generating?: boolean,
-) =>
-  generating || result?.goals.some(({ goal }) => goalStatusPolled(goal.status))
-    ? GOAL_GRAPH_POLL_INTERVAL
-    : 0;
+/**
+ * The composer tray and the working sidebar both read a topic's goals on
+ * mount; this window collapses them into one request. It stays under the poll
+ * interval because SWR's poll ticks dedupe too.
+ */
+const TOPIC_GOALS_DEDUPING_INTERVAL = 4000;
+
+const useTopicGoalsAdvancing = (topicId?: string | null): boolean =>
+  useGoalStore((state) =>
+    topicId
+      ? (state.topicGoalsByTopicId[topicId]?.goals.some(({ goal }) =>
+          goalStatusPolled(goal.status),
+        ) ?? false)
+      : false,
+  );
 
 export type GoalStore = GoalState & GoalAction;
 type Setter = StoreSetter<GoalStore>;
@@ -172,6 +181,7 @@ export class GoalActionImpl {
   readonly #goalMetricSeries;
   readonly #homeGoalList;
   readonly #set: Setter;
+  readonly #topicGoalList;
 
   constructor(set: Setter, get: () => GoalStore, _api?: unknown) {
     void _api;
@@ -205,9 +215,24 @@ export class GoalActionImpl {
       view: recordLens<GoalStore, GoalListValue>('homeGoalsByScope'),
     });
 
-    // One goal row is rendered by a scope's tabs and by the home rail; a change
-    // to it has to reach every list holding it, loaded or only persisted.
-    this.#goalListRows = linkReplicaEntity<GoalListItem>([this.#goalList, this.#homeGoalList]);
+    this.#topicGoalList = createReplicaSlice(topicGoalListResource, {
+      actionPrefix: 'topicGoalList',
+      entity: goalListEntity,
+      fetcher: (topicId) => goalService.list({ limit: TOPIC_GOAL_FETCH_LIMIT, topicId }),
+      get,
+      set,
+      stateKey: 'topicGoalsReplica',
+      view: recordLens<GoalStore, GoalListValue>('topicGoalsByTopicId'),
+    });
+
+    // One goal row is rendered by a scope's tabs, the home rail and the
+    // conversation that created it; a change to it has to reach every list
+    // holding it, loaded or only persisted.
+    this.#goalListRows = linkReplicaEntity<GoalListItem>([
+      this.#goalList,
+      this.#homeGoalList,
+      this.#topicGoalList,
+    ]);
 
     this.#goalGraph = createReplicaSlice(goalGraphResource, {
       actionPrefix: 'goalGraph',
@@ -331,6 +356,42 @@ export class GoalActionImpl {
     await this.refreshGoalGraph(goalId);
   };
 
+  /**
+   * The goal moves to the new agent's goal list, so both agents' lists re-read
+   * along with the page.
+   */
+  setGoalAgent = async (goalId: string, agentId: string): Promise<void> => {
+    await goalService.setAgent(goalId, agentId);
+    await Promise.all([
+      this.refreshGoalGraph(goalId),
+      revalidateReplica(goalListResource),
+      revalidateReplica(homeGoalListResource),
+    ]);
+  };
+
+  /** Unfinished Tasks move with the executor, so their rows on the page re-read too. */
+  setGoalTaskAgent = async (goalId: string, agentId: string | null): Promise<void> => {
+    await goalService.setTaskAgent(goalId, agentId);
+    await this.refreshGoalGraph(goalId);
+  };
+
+  setGoalModel = async (
+    goalId: string,
+    modelConfig: { model: string; provider: string } | null,
+  ): Promise<void> => {
+    await goalService.setModel(goalId, modelConfig);
+    await this.refreshGoalGraph(goalId);
+  };
+
+  /** Unfinished Tasks switch model with it, so their rows re-read too. */
+  setGoalTaskModel = async (
+    goalId: string,
+    modelConfig: { model: string; provider: string } | null,
+  ): Promise<void> => {
+    await goalService.setTaskModel(goalId, modelConfig);
+    await this.refreshGoalGraph(goalId);
+  };
+
   updateGoalRequirement = async (goalId: string, requirement: string): Promise<void> => {
     await goalService.updateRequirement(goalId, requirement);
     await this.refreshGoalGraph(goalId);
@@ -341,15 +402,19 @@ export class GoalActionImpl {
    * own afterwards as its Work Tasks settle, so this is a nudge rather than the
    * loop the surface used to hold open.
    */
+  /** The goal's own planning-model provider, so the relay covers the model it plans on. */
+  #planningProvider = (goalId: string) =>
+    this.#get().goalGraphById[goalId]?.goal.config?.provider ?? undefined;
+
   advanceGoal = async (goalId: string): Promise<GoalTickResult> => {
-    const result = await goalService.advance(goalId);
+    const result = await goalService.advance(goalId, this.#planningProvider(goalId));
     await this.refreshGoalGraph(goalId);
     return result;
   };
 
   /** Exactly one coordinator step, for a caller that wants to inspect a single move. */
   tickGoal = async (goalId: string): Promise<GoalTickResult> => {
-    const result = await goalService.tick(goalId);
+    const result = await goalService.tick(goalId, this.#planningProvider(goalId));
     await this.refreshGoalGraph(goalId);
     return result;
   };
@@ -412,16 +477,19 @@ export class GoalActionImpl {
    * while a `/goal` request is generating (`generating`, decided by the caller)
    * — that run is the one that creates the goal, so nothing on screen would
    * otherwise ask for it.
+   *
+   * Read the rows through `goalSelectors.topicGoals`; the persisted copy paints
+   * first, and `goalSelectors.topicGoalsConfirmed` says when its statuses are
+   * the server's current ones.
    */
-  useFetchTopicGoals = (topicId?: string | null, generating?: boolean) =>
-    useClientDataSWR(
-      topicId ? goalKeys.topicGoals(topicId) : null,
-      () => goalService.list({ limit: TOPIC_GOAL_FETCH_LIMIT, topicId: topicId! }),
-      {
-        refreshInterval: (result) => topicGoalsRefreshInterval(result, generating),
-        revalidateOnFocus: true,
-      },
-    );
+  useFetchTopicGoals = (topicId?: string | null, generating?: boolean) => {
+    const advancing = useTopicGoalsAdvancing(topicId);
+    return this.#topicGoalList.useSync(topicId || null, {
+      dedupingInterval: TOPIC_GOALS_DEDUPING_INTERVAL,
+      refreshInterval: generating || advancing ? GOAL_GRAPH_POLL_INTERVAL : 0,
+      revalidateOnFocus: true,
+    });
+  };
 
   /**
    * North-star data of the goal detail header, read through
@@ -448,6 +516,16 @@ export class GoalActionImpl {
     // built from this client's snapshot would silently drop whatever a
     // concurrent editor or agent declared since the snapshot was read.
     await goalService.setMetricCriteria(goalId, [criterion], 'merge');
+    await this.refreshGoalGraph(goalId);
+    await this.refreshGoalMetricSeries(goalId);
+  };
+
+  /**
+   * Drop one clause so it no longer gates acceptance. Its observations stay in
+   * the series; the server reopens a goal this clause alone was parking.
+   */
+  removeGoalMetric = async (goalId: string, key: string): Promise<void> => {
+    await goalService.removeMetricCriteria(goalId, [key]);
     await this.refreshGoalGraph(goalId);
     await this.refreshGoalMetricSeries(goalId);
   };
@@ -487,6 +565,14 @@ export class GoalActionImpl {
     await this.#homeGoalList.revalidate(scope);
   };
 
+  setGoalListAgentFilter = (agentId?: string): void => {
+    this.#set(
+      { goalListAgentFilter: agentId, goalListVisibleLimit: 10 },
+      false,
+      'setGoalListAgentFilter',
+    );
+  };
+
   setGoalListFilter = (filter: GoalListFilter): void => {
     this.#set({ goalListFilter: filter, goalListVisibleLimit: 10 }, false, 'setGoalListFilter');
   };
@@ -508,9 +594,15 @@ export class GoalActionImpl {
    * network answers, so the page never flashes its empty state over hydrated
    * data.
    */
-  useFetchGoals = (agentId?: string, projectId?: string, filter: GoalListFilter = 'all') => {
+  useFetchGoals = (
+    agentId?: string,
+    projectId?: string,
+    filter: GoalListFilter = 'all',
+    /** Cache scope of the cross-agent page, read when neither id is given. */
+    globalScope?: string,
+  ) => {
     const params: GoalListParams | undefined =
-      agentId || projectId ? { agentId, filter, projectId } : undefined;
+      agentId || projectId || globalScope ? { agentId, filter, globalScope, projectId } : undefined;
     const key = params ? goalListKey(params) : undefined;
     const sync = this.#goalList.useSync(params ?? null, { revalidateOnFocus: true });
 

@@ -35,6 +35,7 @@ import { agentQuotaRouter } from './agentQuota';
 import { agentShareRouter } from './agentShare';
 import { agentSignalRouter } from './agentSignal';
 import { agentSkillsRouter } from './agentSkills';
+import { agentSteerQueueRouter } from './agentSteerQueue';
 import { agentTraceRouter } from './agentTrace';
 import { aiAgentRouter } from './aiAgent';
 import { aiChatRouter } from './aiChat';
@@ -44,7 +45,9 @@ import { apiKeyRouter } from './apiKey';
 import { asrRouter } from './asr';
 import { botMessageRouter } from './botMessage';
 import { briefRouter } from './brief';
+import { canvasRouter } from './canvas';
 import { changelogRouter } from './changelog';
+import { channelRouter } from './channel';
 import { chunkRouter } from './chunk';
 import { comfyuiRouter } from './comfyui';
 import { composioRouter } from './composio';
@@ -56,8 +59,10 @@ import { deviceMetricRouter } from './deviceMetric';
 import { documentRouter } from './document';
 import { documentCommentRouter } from './documentComment';
 import { documentLikeRouter } from './documentLike';
+import { environmentRouter } from './environment';
 import { expertiseRouter } from './expertise';
 import { exporterRouter } from './exporter';
+import { favoriteRouter } from './favorite';
 import { fileRouter } from './file';
 import { followUpActionRouter } from './followUpAction';
 import { generationRouter } from './generation';
@@ -70,6 +75,7 @@ import { importerRouter } from './importer';
 import { klavisRouter } from './klavis';
 import { knowledgeRouter } from './knowledge';
 import { knowledgeBaseRouter } from './knowledgeBase';
+import { linearRouter } from './linear';
 import { llmGenerationTracingRouter } from './llmGenerationTracing';
 import { marketRouter } from './market';
 import { messageRouter } from './message';
@@ -81,6 +87,7 @@ import { oauthAppRouter } from './oauthApp';
 import { oauthDeviceFlowRouter } from './oauthDeviceFlow';
 import { pluginRouter } from './plugin';
 import { projectRouter } from './project';
+import { projectReviewRouter } from './projectReview';
 import { projectWorkingDirectoryRouter } from './projectWorkingDirectory';
 import { pushTokenRouter } from './pushToken';
 import { ragEvalRouter } from './ragEval';
@@ -99,6 +106,7 @@ import { threadRouter } from './thread';
 import { topicRouter } from './topic';
 import { topicCommentRouter } from './topicComment';
 import { trashRouter } from './trash';
+import { ttsRouter } from './tts';
 import { uploadRouter } from './upload';
 import { usageRouter } from './usage';
 import { userRouter } from './user';
@@ -124,11 +132,16 @@ export const lambdaRouter = router({
   agentEvalExternal: agentEvalExternalRouter,
   agentLabel: agentLabelRouter,
   agentSkills: agentSkillsRouter,
+  environment: environmentRouter,
+  favorite: favoriteRouter,
   sandboxStorage: sandboxStorageRouter,
   agentTrace: agentTraceRouter,
   expertise: expertiseRouter,
   agentSignal: agentSignalRouter,
+  agentSteerQueue: agentSteerQueueRouter,
+  canvas: canvasRouter,
   changelog: changelogRouter,
+  channel: channelRouter,
   brief: briefRouter,
   aiAgent: aiAgentRouter,
   aiChat: aiChatRouter,
@@ -138,6 +151,7 @@ export const lambdaRouter = router({
   aiProvider: aiProviderRouter,
   apiKey: apiKeyRouter,
   asr: asrRouter,
+  tts: ttsRouter,
   chunk: chunkRouter,
   comfyui: comfyuiRouter,
   config: configRouter,
@@ -165,6 +179,7 @@ export const lambdaRouter = router({
   klavis: klavisRouter,
   knowledge: knowledgeRouter,
   knowledgeBase: knowledgeBaseRouter,
+  linear: linearRouter,
   llmGenerationTracing: llmGenerationTracingRouter,
   market: marketRouter,
   message: messageRouter,
@@ -176,6 +191,7 @@ export const lambdaRouter = router({
   oauthDeviceFlow: oauthDeviceFlowRouter,
   plugin: pluginRouter,
   project: projectRouter,
+  projectReview: projectReviewRouter,
   projectWorkingDirectory: projectWorkingDirectoryRouter,
   pushToken: pushTokenRouter,
   ragEval: ragEvalRouter,
