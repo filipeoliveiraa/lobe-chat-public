@@ -67,6 +67,11 @@ export interface ModelTokensUsage {
 
   inputCacheMissTokens?: number;
   /**
+   * Input text characters, billed through `millionCharacters` pricing units
+   * (e.g. character-billed text-to-speech models).
+   */
+  inputCharacters?: number;
+  /**
    * currently only pplx has citation_tokens
    */
   inputCitationTokens?: number;
@@ -125,6 +130,7 @@ export const ModelUsageSchema = z.object({
   inputVideoTokens: z.number().optional(),
   inputCitationTokens: z.number().optional(),
   inputToolTokens: z.number().optional(),
+  inputCharacters: z.number().optional(),
 
   // Output tokens breakdown
   outputTextTokens: z.number().optional(),
@@ -236,6 +242,13 @@ export interface AgentSenderMetadata {
    * own conversation instead of the group the turn actually came from.
    */
   chatGroupId?: string;
+  /**
+   * How many agent → agent sends in a row led to this message: 1 when the
+   * sending turn was started by a person, one more than the message that
+   * started the sending turn otherwise. The server refuses a send past
+   * `MAX_AGENT_RELAY_HOPS`, so two agents cannot keep waking each other.
+   */
+  hop?: number;
   /** Sending agent's personal name at send time; resolve the label with `agentDisplayName`. */
   name?: string;
   /**
@@ -266,6 +279,7 @@ export const AgentSenderMetadataSchema = z.object({
   agentId: z.string(),
   avatar: z.string().optional(),
   chatGroupId: z.string().optional(),
+  hop: z.number().int().positive().optional(),
   name: z.string().optional(),
   threadId: z.string().optional(),
   title: z.string().optional(),

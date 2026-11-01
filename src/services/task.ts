@@ -134,8 +134,11 @@ class TaskService {
     visibility?: 'private' | 'public';
   }) => lambdaClient.task.create.mutate(params);
 
-  updateVisibility = async (id: string, visibility: 'private' | 'public') =>
-    lambdaClient.task.updateVisibility.mutate({ id, visibility });
+  updateVisibility = async (
+    id: string,
+    visibility: 'private' | 'public',
+    options?: { takeOwnership?: boolean },
+  ) => lambdaClient.task.updateVisibility.mutate({ id, visibility, ...options });
 
   update = async (
     id: string,
@@ -194,8 +197,10 @@ class TaskService {
   updateStatusCascade = async (id: string, status: 'canceled' | 'completed') =>
     lambdaClient.task.updateStatusCascade.mutate({ id, status });
 
-  run = async (id: string, params?: { continueTopicId?: string; prompt?: string }) =>
-    lambdaClient.task.run.mutate({ id, ...params });
+  run = async (
+    id: string,
+    params?: { continueTopicId?: string; model?: string; prompt?: string; provider?: string },
+  ) => lambdaClient.task.run.mutate({ id, ...params });
 
   previewSubtaskLayers = async (id: string) => lambdaClient.task.previewSubtaskLayers.query({ id });
 

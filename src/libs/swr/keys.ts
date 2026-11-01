@@ -489,6 +489,8 @@ export const userMemoryKeys = {
     taskId,
   ]),
   contexts: def('userMemory:contexts', (params: unknown) => ['userMemory:contexts', params]),
+  contextStories: def('userMemory:contextStories', () => ['userMemory:contextStories']),
+  contextStory: def('userMemory:contextStory', (id: string) => ['userMemory:contextStory', id]),
   experiences: def('userMemory:experiences', (params: unknown) => [
     'userMemory:experiences',
     params,
@@ -779,6 +781,7 @@ export const shareKeys = {
     agentId,
   ]),
   artifact: def('share:artifact', (id: string) => ['share:artifact', id]),
+  file: def('share:file', (shareId: string) => ['share:file', shareId]),
   pageDocument: def('share:pageDocument', (documentId: string) => [
     'share:pageDocument',
     documentId,
@@ -797,6 +800,21 @@ export const forkKeys = {
 
 // ---- local file ---------------------------------------------------------
 export const localFileKeys = {
+  claudeCodeMemory: def(
+    'localFile:claudeCodeMemory',
+    (
+      deviceId: string | undefined,
+      workingDirectory: string,
+      configDir?: string,
+      projectDirName?: string,
+    ) => [
+      'localFile:claudeCodeMemory',
+      deviceId ?? 'local',
+      workingDirectory,
+      configDir ?? '',
+      projectDirName ?? '',
+    ],
+  ),
   gitWorkingTreeFiles: def(
     'localFile:gitWorkingTreeFiles',
     (deviceId: string | undefined, dirPath: string) => [
@@ -842,6 +860,10 @@ export const favoriteKeys = {
 };
 
 // ---- changelog ----------------------------------------------------------
+export const canvasKeys = {
+  storage: def('canvas:storage', () => ['canvas:storage']),
+};
+
 export const changelogKeys = {
   modalIndex: def('changelog:modalIndex', () => ['changelog:modalIndex']),
   post: def('changelog:post', (id: string, locale: string) => ['changelog:post', id, locale]),
@@ -878,6 +900,30 @@ export const agentSignalKeys = {
     agentId,
     topicId,
   ]),
+};
+
+// ---- bot wake records (one bot's judged messages; never persisted) ----
+export const botWakeKeys = {
+  decisions: def(
+    'botWake:decisions',
+    // Keyed by context: a bot id is only visible in the workspace it lives in.
+    (
+      workspaceId: string | null,
+      botId: string,
+      filters: { followupOnly: boolean; outcome?: string; unmarkedOnly: boolean },
+      cursor: { createdAt: string; id: string } | undefined,
+    ) => [
+      'botWake:decisions',
+      workspaceId,
+      botId,
+      filters.outcome ?? null,
+      filters.followupOnly,
+      filters.unmarkedOnly,
+      cursor?.createdAt ?? null,
+      cursor?.id ?? null,
+    ],
+  ),
+  summary: def('botWake:summary', (botId: string) => ['botWake:summary', botId]),
 };
 
 // ---- misc UI singletons -------------------------------------------------
@@ -963,6 +1009,7 @@ export const swrKeys = {
   agentSignal: agentSignalKeys,
   auth: authKeys,
   brief: briefKeys,
+  canvas: canvasKeys,
   changelog: changelogKeys,
   cron: cronKeys,
   device: deviceKeys,

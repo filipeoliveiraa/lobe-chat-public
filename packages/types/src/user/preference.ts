@@ -121,8 +121,11 @@ export interface WorkspaceUserPreference {
    */
   sidebarPinnedOverrides?: Record<string /* itemId */, boolean>;
   /**
-   * Topic sidebars list only the topics this member created, hiding the other
-   * members' topics under the same agent / group.
+   * Topic sidebars list only the topics this member created.
+   *
+   * @deprecated The filter is a device-local, per-agent choice now
+   *   (`systemStatus.topicOnlyMineByAgent`). Existing values are ignored;
+   *   nothing reads or writes this key.
    */
   topicOnlyMine?: boolean;
 }
@@ -248,12 +251,6 @@ export const UserLabSchema = z.object({
    * running there can be opened from this UI
    */
   enableDeviceTunnel: z.boolean().optional(),
-  /**
-   * opt this user's cloud-sandbox runs into a persistent workspace: the working
-   * directory survives session recycling and is shared across their topics,
-   * instead of being thrown away with the sandbox
-   */
-  enablePersistentSandbox: z.boolean().optional(),
 });
 
 export type UserLab = z.infer<typeof UserLabSchema>;
